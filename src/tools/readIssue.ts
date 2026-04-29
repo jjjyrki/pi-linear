@@ -3,7 +3,6 @@ import { Type } from '@mariozechner/pi-ai';
 
 import { getLinearClient } from '../client.js';
 import { normalizeIssue } from '../linear/shared.js';
-import { resolveIssue } from '../linear/resolveIssue.js';
 import { sharedIssueIdentifierSchema } from '../schemas.js';
 import { isNonEmptyTrimmedString } from '../validation.js';
 
@@ -17,9 +16,7 @@ export async function readIssue(input: Record<string, unknown>) {
     throw new Error('issueId must be a non-empty string.');
   }
 
-  const client = getLinearClient();
-  const resolved = await resolveIssue(client, issueReference);
-  const issue = await client.issue(resolved.id);
+  const issue = await getLinearClient().issue(issueReference.trim());
   if (!issue) {
     throw new Error(`Issue not found: ${issueReference}`);
   }

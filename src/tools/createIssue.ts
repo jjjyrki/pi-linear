@@ -93,8 +93,8 @@ function optionalStringArray(value: unknown, fieldName: string): string[] | unde
 
 function optionalNumber(value: unknown, fieldName: string): number | undefined {
   if (value === undefined) return undefined;
-  if (typeof value !== 'number') {
-    throw new LinearValidationError(`${fieldName} must be a number when provided.`);
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    throw new LinearValidationError(`${fieldName} must be a finite number when provided.`);
   }
   return value;
 }

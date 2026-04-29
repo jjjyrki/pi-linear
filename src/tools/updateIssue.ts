@@ -131,8 +131,8 @@ function optionalStringArray(value: unknown, fieldName: string): string[] | unde
 function optionalNullableNumber(value: unknown, fieldName: string): number | null | undefined {
   if (value === undefined) return undefined;
   if (value === null) return null;
-  if (typeof value !== 'number') {
-    throw new LinearValidationError(`${fieldName} must be a number or null when provided.`);
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    throw new LinearValidationError(`${fieldName} must be a finite number or null when provided.`);
   }
   return value;
 }

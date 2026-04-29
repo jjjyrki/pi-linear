@@ -33,6 +33,7 @@ describe('issue tools', () => {
   it('rejects invalid create input and failed mutations', async () => {
     await expect(createIssue({ teamId: ' ', title: 'ok' })).rejects.toThrow(/teamId/i);
     await expect(createIssue({ teamId: 't1', title: '   ' })).rejects.toThrow(/title/i);
+    await expect(createIssue({ teamId: 't1', title: 'ok', estimate: Number.NaN })).rejects.toThrow(/finite number/i);
 
     getLinearClientMock.mockReturnValue({
       createIssue: jest.fn().mockResolvedValue({ success: false } as never),
@@ -40,24 +41,23 @@ describe('issue tools', () => {
     await expect(createIssue({ teamId: 't1', title: 'Bug fix' })).rejects.toThrow(/Failed to create/);
   });
 
-  it('reads issue by resolving identifier first and includes description', async () => {
+  it('reads issue by identifier and includes description', async () => {
     const issueFn = jest
       .fn()
-      .mockResolvedValueOnce({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' } as never)
       .mockResolvedValueOnce({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix', description: 'details' } as never);
 
     getLinearClientMock.mockReturnValue({ issue: issueFn } as never);
 
     const issue = await readIssue({ issueId: 'ENG-1' });
     expect(issue.description).toBe('details');
-    expect(issueFn).toHaveBeenNthCalledWith(1, 'ENG-1');
-    expect(issueFn).toHaveBeenNthCalledWith(2, 'i1');
+    expect(issueFn).toHaveBeenCalledTimes(1);
+    expect(issueFn).toHaveBeenCalledWith('ENG-1');
   });
 
   it('rejects invalid read input and missing issue', async () => {
     await expect(readIssue({ issueId: '   ' })).rejects.toThrow(/issueId/i);
 
-    const issueFn = jest.fn().mockResolvedValueOnce({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' } as never).mockResolvedValueOnce(undefined as never);
+    const issueFn = jest.fn().mockResolvedValueOnce(undefined as never);
     getLinearClientMock.mockReturnValue({ issue: issueFn } as never);
 
     await expect(readIssue({ issueId: 'ENG-1' })).rejects.toThrow(/Issue not found/);
@@ -111,6 +111,16 @@ describe('issue tools', () => {
 
     const issue = await updateIssue({ issueId: 'ENG-1', title: 'Updated' });
     expect(issue.title).toBe('Updated');
+    expect(updateIssueFn).toHaveBeenCalledWith('i1', {
+      title: 'Updated',
+      description: undefined,
+      stateId: undefined,
+      assigneeId: undefined,
+      labelIds: undefined,
+      estimate: undefined,
+      dueDate: undefined,
+      priority: undefined,
+    });
 
     expect(() => buildIssueUpdateInput({ issueId: 'ENG-1' })).toThrow(LinearValidationError);
   });
@@ -118,6 +128,7 @@ describe('issue tools', () => {
   it('validates update field rules and surfaces mutation failures', async () => {
     expect(() => buildIssueUpdateInput({ issueId: 'ENG-1', stateId: null })).toThrow(/stateId cannot be null/i);
     expect(() => buildIssueUpdateInput({ issueId: 'ENG-1', description: '   ' })).toThrow(/description/i);
+    expect(() => buildIssueUpdateInput({ issueId: 'ENG-1', estimate: Number.POSITIVE_INFINITY })).toThrow(/finite number/i);
 
     const issueFn = jest.fn().mockResolvedValue({ id: 'i1', identifier: 'ENG-1', title: 'A' } as never);
     const updateIssueFn = jest.fn().mockResolvedValue({ success: false } as never);
