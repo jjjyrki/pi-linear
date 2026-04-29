@@ -111,17 +111,21 @@ describe('linear core helpers', () => {
     const comment = normalizeComment({
       id: 'comment-1',
       body: 'Looks good',
-      issueId: 'issue-1',
+      parentId: 'comment-root',
+      issue: { id: 'issue-1', identifier: 'ENG-1', title: 'Fix it' },
       user: { id: 'user-2', displayName: 'Grace', email: 'grace@example.com' },
       createdAt: new Date('2026-04-02T01:00:00.000Z'),
       updatedAt: '2026-04-02T02:00:00.000Z',
+      editedAt: '2026-04-02T03:00:00.000Z',
     });
 
     expect(comment).toMatchObject({
       id: 'comment-1',
       body: 'Looks good',
-      issue: { id: 'issue-1' },
+      parentId: 'comment-root',
+      issue: { id: 'issue-1', identifier: 'ENG-1', title: 'Fix it' },
       user: { id: 'user-2', displayName: 'Grace' },
+      editedAt: '2026-04-02T03:00:00.000Z',
     });
     expect(comment.user).not.toHaveProperty('email');
 
