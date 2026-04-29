@@ -29,6 +29,7 @@ pnpm-debug.log*
 .prettier-cache
 .parcel-cache
 .turbo/
+.husky/_/
 *.swp
 *.swo
 *~
