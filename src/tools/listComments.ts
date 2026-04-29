@@ -2,7 +2,7 @@ import { defineTool } from '@mariozechner/pi-coding-agent';
 import { Type } from '@mariozechner/pi-ai';
 
 import { getLinearClient } from '../client.js';
-import { LinearValidationError } from '../errors.js';
+import { LinearNotFoundError, LinearValidationError } from '../errors.js';
 import { resolveIssue } from '../linear/resolveIssue.js';
 import { normalizeComment, normalizePageInfo, type NormalizedComment, type NormalizedIssueSummary } from '../linear/shared.js';
 import { sharedIssueIdentifierSchema } from '../schemas.js';
@@ -22,6 +22,10 @@ export async function listComments(input: Record<string, unknown>): Promise<{ co
   const client = getLinearClient();
   const issue = await resolveIssue(client, issueReference);
   const issueModel = await client.issue(issue.id);
+  if (!issueModel) {
+    throw new LinearNotFoundError(`Issue not found: ${issue.id}`);
+  }
+
   const commentsConnection = await issueModel.comments({
     first,
     after,

@@ -58,6 +58,14 @@ describe('comment tools', () => {
     await expect(createComment({ issueId: 'ENG-1', body: 'Looks good' })).rejects.toThrow(/Failed to create/);
   });
 
+  it('rejects createComment responses that omit comment payload on success', async () => {
+    const issueFn = jest.fn().mockResolvedValue({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' } as never);
+    const createCommentFn = jest.fn().mockResolvedValue({ success: true, comment: undefined } as never);
+    getLinearClientMock.mockReturnValue({ issue: issueFn, createComment: createCommentFn } as never);
+
+    await expect(createComment({ issueId: 'ENG-1', body: 'Looks good' })).rejects.toThrow(/did not return a comment/i);
+  });
+
   it('lists comments oldest-first with pagination bounds', async () => {
     const commentsFn = jest.fn().mockResolvedValue({
       nodes: [
@@ -112,6 +120,17 @@ describe('comment tools', () => {
   it('rejects invalid pagination input', async () => {
     await expect(listComments({ issueId: 'ENG-1', first: 101 })).rejects.toThrow(/at most 100/i);
     await expect(listComments({ issueId: 'ENG-1', after: '   ' })).rejects.toThrow(/after/i);
+  });
+
+  it('throws not found when second issue lookup returns null before loading comments', async () => {
+    const issueFn = jest
+      .fn()
+      .mockResolvedValueOnce({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' } as never)
+      .mockResolvedValueOnce(null as never);
+
+    getLinearClientMock.mockReturnValue({ issue: issueFn } as never);
+
+    await expect(listComments({ issueId: 'ENG-1' })).rejects.toThrow(/Issue not found: i1/i);
   });
 
   it('tool output follows the content and details contract', async () => {
