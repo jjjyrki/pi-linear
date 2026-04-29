@@ -6,7 +6,7 @@ import { normalizeDiscoveryWorkflowState, type NormalizedWorkflowState } from '.
 
 const listWorkflowStatesSchema = Type.Object({});
 
-export async function listLinearWorkflowStates(): Promise<{ workflowStates: NormalizedWorkflowState[] }> {
+export async function listLinearWorkflowStates(): Promise<{ workflowStates: NormalizedWorkflowState[]; truncated: boolean }> {
   const client = getLinearClient();
   const workflowStates: NormalizedWorkflowState[] = [];
   let after: string | undefined;
@@ -16,16 +16,16 @@ export async function listLinearWorkflowStates(): Promise<{ workflowStates: Norm
     workflowStates.push(...(connection.nodes ?? []).map(normalizeDiscoveryWorkflowState));
 
     if (!connection.pageInfo?.hasNextPage) {
-      return { workflowStates };
+      return { workflowStates, truncated: false };
     }
 
     after = connection.pageInfo.endCursor ?? undefined;
     if (!after) {
-      break;
+      return { workflowStates, truncated: false };
     }
   }
 
-  return { workflowStates };
+  return { workflowStates, truncated: true };
 }
 
 export const linearListWorkflowStatesTool = defineTool({
@@ -35,8 +35,12 @@ export const linearListWorkflowStatesTool = defineTool({
   parameters: listWorkflowStatesSchema,
   async execute() {
     const result = await listLinearWorkflowStates();
+    const text = result.truncated
+      ? `Found ${result.workflowStates.length} workflow states (truncated at 1000)`
+      : `Found ${result.workflowStates.length} workflow states`;
+
     return {
-      content: [{ type: 'text', text: `Found ${result.workflowStates.length} workflow states` }],
+      content: [{ type: 'text', text }],
       details: result,
     };
   },

@@ -123,6 +123,7 @@ describe('discovery tools', () => {
       { id: 's2', name: 'In Progress', type: 'started', team: { id: 't1', key: 'ENG', name: 'Engineering' } },
       { id: 's3', name: 'Done', type: 'completed', team: { id: 't2', key: 'OPS', name: 'Operations' } },
     ]);
+    expect(result.truncated).toBe(false);
 
     workflowStatesFn.mockResolvedValue({
       nodes: [
@@ -135,6 +136,24 @@ describe('discovery tools', () => {
 
     const response = await linearListWorkflowStatesTool.execute('tool-call-id', {}, new AbortController().signal, undefined, {} as never);
     expect((response.content[0] as { text: string }).text).toBe('Found 3 workflow states');
+    expect(response.details.truncated).toBe(false);
     expect(response.details.workflowStates[0].name).toBe('Todo');
+  });
+
+  it('marks workflow state responses as truncated when page cap is reached', async () => {
+    const workflowStatesFn = jest.fn().mockResolvedValue({
+      nodes: [{ id: 's1', name: 'Todo', type: 'backlog' }],
+      pageInfo: { hasNextPage: true, hasPreviousPage: false, endCursor: 'cursor-next', startCursor: 'cursor-start' },
+    } as never);
+
+    getLinearClientMock.mockReturnValue({ workflowStates: workflowStatesFn } as never);
+
+    const result = await listLinearWorkflowStates();
+    expect(workflowStatesFn).toHaveBeenCalledTimes(10);
+    expect(result.truncated).toBe(true);
+
+    const response = await linearListWorkflowStatesTool.execute('tool-call-id', {}, new AbortController().signal, undefined, {} as never);
+    expect((response.content[0] as { text: string }).text).toContain('truncated at 1000');
+    expect(response.details.truncated).toBe(true);
   });
 });
