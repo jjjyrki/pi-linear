@@ -90,18 +90,20 @@ describe('comment tools', () => {
       pageInfo: { hasNextPage: true, hasPreviousPage: false, endCursor: 'cursor-2', startCursor: 'cursor-1' },
     } as never);
 
-    const issueFn = jest
-      .fn()
-      .mockResolvedValueOnce({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' } as never)
-      .mockResolvedValueOnce({ comments: commentsFn } as never);
+    const issueFn = jest.fn().mockResolvedValueOnce({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' } as never);
 
-    getLinearClientMock.mockReturnValue({ issue: issueFn } as never);
+    getLinearClientMock.mockReturnValue({ issue: issueFn, comments: commentsFn } as never);
 
     const result = await listComments({ issueId: 'ENG-1', first: 25, after: 'cursor-1' });
 
-    expect(issueFn).toHaveBeenNthCalledWith(1, 'ENG-1');
-    expect(issueFn).toHaveBeenNthCalledWith(2, 'i1');
-    expect(commentsFn).toHaveBeenCalledWith({ first: 25, after: 'cursor-1', orderBy: 'createdAt' });
+    expect(issueFn).toHaveBeenCalledTimes(1);
+    expect(issueFn).toHaveBeenCalledWith('ENG-1');
+    expect(commentsFn).toHaveBeenCalledWith({
+      first: 25,
+      after: 'cursor-1',
+      filter: { issue: { id: { eq: 'i1' } } },
+      orderBy: 'createdAt',
+    });
     expect(result.nodes).toHaveLength(2);
     expect(result.nodes[0]).toMatchObject({
       id: 'c1',
@@ -122,17 +124,6 @@ describe('comment tools', () => {
     await expect(listComments({ issueId: 'ENG-1', after: '   ' })).rejects.toThrow(/after/i);
   });
 
-  it('throws not found when second issue lookup returns null before loading comments', async () => {
-    const issueFn = jest
-      .fn()
-      .mockResolvedValueOnce({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' } as never)
-      .mockResolvedValueOnce(null as never);
-
-    getLinearClientMock.mockReturnValue({ issue: issueFn } as never);
-
-    await expect(listComments({ issueId: 'ENG-1' })).rejects.toThrow(/Issue not found: i1/i);
-  });
-
   it('tool output follows the content and details contract', async () => {
     const issueFn = jest.fn().mockResolvedValue({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' } as never);
     const createCommentFn = jest.fn().mockResolvedValue({
@@ -151,10 +142,8 @@ describe('comment tools', () => {
       pageInfo: { hasNextPage: false, hasPreviousPage: false },
     } as never);
     getLinearClientMock.mockReturnValue({
-      issue: jest
-        .fn()
-        .mockResolvedValueOnce({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' } as never)
-        .mockResolvedValueOnce({ comments: commentsFn } as never),
+      issue: jest.fn().mockResolvedValueOnce({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' } as never),
+      comments: commentsFn,
     } as never);
 
     const listResponse = await linearListCommentsTool.execute('tool-call-id', { issueId: 'ENG-1' }, new AbortController().signal, undefined, {} as never);
