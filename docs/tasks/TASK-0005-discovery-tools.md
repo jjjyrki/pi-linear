@@ -47,8 +47,9 @@ Out of scope:
 - Use default page size `25`, maximum `100`, and reject above max.
 
 ## Workflow States
-- Return all workflow states in one bounded response.
+- Return workflow states in one bounded response, capped at 1000 states for the MVP.
 - Include `id`, `name`, `type`, and team summary where available.
+- Include `truncated: true` when more workflow states may be available beyond the cap.
 - Do not expose `teamId` filtering in the MVP.
 
 # Acceptance Criteria

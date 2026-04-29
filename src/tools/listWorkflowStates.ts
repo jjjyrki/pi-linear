@@ -31,7 +31,7 @@ export async function listLinearWorkflowStates(): Promise<{ workflowStates: Norm
 export const linearListWorkflowStatesTool = defineTool({
   name: 'linear_list_workflow_states',
   label: 'List Workflow States',
-  description: 'List Linear workflow states so agents can discover state IDs.',
+  description: 'List up to 1000 Linear workflow states so agents can discover state IDs.',
   parameters: listWorkflowStatesSchema,
   async execute() {
     const result = await listLinearWorkflowStates();
