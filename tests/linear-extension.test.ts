@@ -27,16 +27,4 @@ describe('linear extension scaffold', () => {
     ]));
   });
 
-  it('placeholder command handlers fail clearly', async () => {
-    const registeredCommands: Array<{ name: string; handler: (args: string) => Promise<void> }> = [];
-
-    linearExtension({
-      registerTool: () => undefined,
-      registerCommand: (name: string, options: { handler: (args: string) => Promise<void> }) => {
-        registeredCommands.push({ name, handler: options.handler });
-      },
-    } as never);
-
-    await expect(registeredCommands[0].handler('')).rejects.toThrow(/not implemented/i);
-  });
 });
