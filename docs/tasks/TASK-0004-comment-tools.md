@@ -1,5 +1,5 @@
 id: TASK-0004
-status: todo
+status: done
 summary: Implement Linear issue comment create and list tools
 
 # Goal
@@ -48,11 +48,11 @@ Out of scope:
 - Return comment bodies because the primary use case is discussion context.
 
 # Acceptance Criteria
-- [ ] Agents can add a comment to an issue by UUID or human identifier.
-- [ ] Agents can add a threaded reply with `parentId`.
-- [ ] Agents can list comments for an issue with bounded pagination.
-- [ ] Listed comments are flat and oldest-first.
-- [ ] Tool output follows the PRD `content` and `details` contract.
+- [x] Agents can add a comment to an issue by UUID or human identifier.
+- [x] Agents can add a threaded reply with `parentId`.
+- [x] Agents can list comments for an issue with bounded pagination.
+- [x] Listed comments are flat and oldest-first.
+- [x] Tool output follows the PRD `content` and `details` contract.
 
 # Testing Expectations
 - Unit-test comment creation with mocked SDK mutation results.
