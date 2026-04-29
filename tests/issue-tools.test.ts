@@ -71,7 +71,7 @@ describe('issue tools', () => {
     getLinearClientMock.mockReturnValue({ issues: issuesFn } as never);
 
     const result = await listIssues({ first: 25 });
-    expect(result.issues).toHaveLength(1);
+    expect(result.nodes).toHaveLength(1);
 
     const args = issuesFn.mock.calls[0][0] as Record<string, unknown>;
     expect(args.orderBy).toBe('updatedAt');

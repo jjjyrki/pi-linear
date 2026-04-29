@@ -14,7 +14,7 @@ const listCommentsSchema = Type.Object({
   after: Type.Optional(Type.String()),
 });
 
-export async function listComments(input: Record<string, unknown>): Promise<{ comments: NormalizedComment[]; pageInfo: ReturnType<typeof normalizePageInfo>; issue: NormalizedIssueSummary }> {
+export async function listComments(input: Record<string, unknown>): Promise<{ nodes: NormalizedComment[]; pageInfo: ReturnType<typeof normalizePageInfo>; issue: NormalizedIssueSummary }> {
   const issueReference = requireNonEmptyString(input.issueId, 'issueId');
   const first = validatePaginationFirst(input.first, { defaultValue: 25, maxValue: 100 });
   const after = optionalString(input.after, 'after');
@@ -32,14 +32,14 @@ export async function listComments(input: Record<string, unknown>): Promise<{ co
     orderBy: 'createdAt',
   } as never);
 
-  const comments = (commentsConnection.nodes ?? []).map((comment) => {
+  const nodes = (commentsConnection.nodes ?? []).map((comment) => {
     const normalized = normalizeComment(comment);
     normalized.issue = { ...issue, ...normalized.issue };
     return normalized;
   });
 
   return {
-    comments,
+    nodes,
     pageInfo: normalizePageInfo(commentsConnection.pageInfo),
     issue,
   };
@@ -53,7 +53,7 @@ export const linearListCommentsTool = defineTool({
   async execute(_toolCallId, input) {
     const result = await listComments(input as Record<string, unknown>);
     return {
-      content: [{ type: 'text', text: `Found ${result.comments.length} comments on ${result.issue.identifier}` }],
+      content: [{ type: 'text', text: `Found ${result.nodes.length} comments on ${result.issue.identifier}` }],
       details: result,
     };
   },

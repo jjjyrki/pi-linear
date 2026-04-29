@@ -102,13 +102,13 @@ describe('comment tools', () => {
     expect(issueFn).toHaveBeenNthCalledWith(1, 'ENG-1');
     expect(issueFn).toHaveBeenNthCalledWith(2, 'i1');
     expect(commentsFn).toHaveBeenCalledWith({ first: 25, after: 'cursor-1', orderBy: 'createdAt' });
-    expect(result.comments).toHaveLength(2);
-    expect(result.comments[0]).toMatchObject({
+    expect(result.nodes).toHaveLength(2);
+    expect(result.nodes[0]).toMatchObject({
       id: 'c1',
       body: 'First',
       issue: { id: 'i1', identifier: 'ENG-1', title: 'Bug fix' },
     });
-    expect(result.comments[1]).toMatchObject({
+    expect(result.nodes[1]).toMatchObject({
       id: 'c2',
       body: 'Second',
       parentId: 'c1',
@@ -159,6 +159,6 @@ describe('comment tools', () => {
 
     const listResponse = await linearListCommentsTool.execute('tool-call-id', { issueId: 'ENG-1' }, new AbortController().signal, undefined, {} as never);
     expect((listResponse.content[0] as { text: string }).text).toMatch(/Found 1 comments/);
-    expect(listResponse.details.comments).toHaveLength(1);
+    expect(listResponse.details.nodes).toHaveLength(1);
   });
 });

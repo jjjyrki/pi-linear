@@ -44,10 +44,10 @@ export async function listIssues(input: Record<string, unknown>) {
     orderBy: 'updatedAt',
   } as never);
 
-  const issues = (connection.nodes ?? []).map((issue) => normalizeIssueSummary(issue));
+  const nodes = (connection.nodes ?? []).map((issue) => normalizeIssueSummary(issue));
   const pageInfo = normalizePageInfo(connection.pageInfo);
 
-  return { issues, pageInfo };
+  return { nodes, pageInfo };
 }
 
 export const linearListIssuesTool = defineTool({
@@ -58,7 +58,7 @@ export const linearListIssuesTool = defineTool({
   async execute(_toolCallId, input) {
     const result = await listIssues(input as Record<string, unknown>);
     return {
-      content: [{ type: 'text', text: `Found ${result.issues.length} issues` }],
+      content: [{ type: 'text', text: `Found ${result.nodes.length} issues` }],
       details: result,
     };
   },
