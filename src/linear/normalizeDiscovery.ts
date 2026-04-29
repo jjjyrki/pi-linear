@@ -1,5 +1,7 @@
-import { createNotImplementedError } from '../errors.js';
-
-export function normalizeDiscovery(): never {
-  throw createNotImplementedError('normalizeDiscovery');
-}
+export {
+  normalizeDiscoveryTeam,
+  normalizeDiscoveryUser,
+  normalizeDiscoveryWorkflowState,
+  normalizePageInfo,
+  normalizeViewer,
+} from './shared.js';
