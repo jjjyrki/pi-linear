@@ -3,21 +3,34 @@
   "version": "0.1.0",
   "private": true,
   "description": "Pi extension for working with Linear",
+  "type": "module",
+  "pi": {
+    "extensions": ["./src/index.ts"]
+  },
   "scripts": {
     "prepare": "husky",
     "lint": "tsc --noEmit -p tsconfig.json",
     "build": "tsc -p tsconfig.build.json",
     "ci": "npm run lint && npm run test:coverage && npm run build",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:ci": "jest --runInBand",
-    "test:coverage": "jest --coverage --runInBand",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch",
+    "test:ci": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
+    "test:coverage": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage --runInBand",
     "lint:commit": "commitlint --edit",
     "release": "standard-version"
+  },
+  "dependencies": {
+    "@linear/sdk": "^82.1.0"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-ai": "^0.70.6",
+    "@mariozechner/pi-coding-agent": "^0.70.6"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.2",
     "@commitlint/config-conventional": "^20.5.0",
+    "@mariozechner/pi-ai": "^0.70.6",
+    "@mariozechner/pi-coding-agent": "^0.70.6",
     "@types/jest": "^29.5.14",
     "@types/node": "^25.6.0",
     "husky": "^9.1.7",
