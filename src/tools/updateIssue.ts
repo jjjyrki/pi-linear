@@ -18,7 +18,7 @@ const updateIssueSchema = Type.Object({
   issueId: sharedIssueIdentifierSchema,
   title: Type.Optional(Type.String()),
   description: optionalTextSchema,
-  stateId: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+  stateId: Type.Optional(Type.String()),
   assigneeId: Type.Optional(Type.Union([Type.String(), Type.Null()])),
   priority: Type.Optional(prioritySchema),
   labelIds: Type.Optional(Type.Array(Type.String())),
