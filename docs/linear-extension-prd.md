@@ -261,9 +261,11 @@ Parameters:
 
 Returns:
 - `workflowStates`: `id`, `name`, `type`, and team summary where available.
+- `truncated`: `true` when the bounded response cap is reached before all states are returned.
 
 Implementation:
-- Return all workflow states in one bounded response.
+- Return workflow states in one bounded response, capped at 1000 states for the MVP.
+- Set `truncated: true` when more workflow states may be available beyond the cap.
 - Do not add team-scoped state filtering in the MVP because the expected workspace uses one team.
 
 ## Proposed Pi Slash Commands
