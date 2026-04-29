@@ -20,9 +20,12 @@ describe('linear extension scaffold', () => {
     expect(commandNames).toEqual([...linearCommandNames]);
   });
 
-  it('placeholder tool handlers fail clearly', async () => {
+  it('still includes placeholder handlers for not-yet-implemented tools', async () => {
+    const placeholderTool = linearToolDefinitions.find((tool) => tool.name === 'linear_create_comment');
+    expect(placeholderTool).toBeDefined();
+
     await expect(
-      linearToolDefinitions[0].execute(
+      placeholderTool!.execute(
         'tool-call-id',
         {},
         new AbortController().signal,
