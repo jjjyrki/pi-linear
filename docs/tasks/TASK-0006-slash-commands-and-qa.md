@@ -1,5 +1,5 @@
 id: TASK-0006
-status: todo
+status: done
 summary: Implement Linear slash commands and complete MVP QA
 
 # Goal
@@ -54,12 +54,12 @@ Out of scope:
 - Verify package install/load instructions still match reality.
 
 # Acceptance Criteria
-- [ ] Users can run `/linear` for help and examples.
-- [ ] Users can run `/linear-status` to validate setup safely.
-- [ ] Users can run `/linear-tools` to inspect the tool surface.
-- [ ] All eleven tools and three slash commands are registered from `src/index.ts`.
-- [ ] The package can be loaded by Pi as an extension.
-- [ ] PRD acceptance criteria are either satisfied or explicitly deferred.
+- [x] Users can run `/linear` for help and examples.
+- [x] Users can run `/linear-status` to validate setup safely.
+- [x] Users can run `/linear-tools` to inspect the tool surface.
+- [x] All eleven tools and three slash commands are registered from `src/index.ts`.
+- [x] The package can be loaded by Pi as an extension.
+- [x] PRD acceptance criteria are either satisfied or explicitly deferred.
 
 # Testing Expectations
 - Unit-test slash command handlers with mocked Pi command contexts where practical.
@@ -76,3 +76,4 @@ Out of scope:
 
 # Follow-Ups
 - Implement future PRD items only after the MVP is complete and reviewed.
+- Manual sandbox smoke test remains deferred until valid Linear credentials are available.
