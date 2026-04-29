@@ -31,11 +31,13 @@ jobs:
           else
             FROM="${{ github.event.before }}"
             TO="${{ github.sha }}"
+
+            if [ "$FROM" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$FROM^{commit}" 2>/dev/null; then
+              FROM="$(git merge-base "origin/${{ github.event.repository.default_branch }}" "$TO")"
+            fi
           fi
 
-          if [ "$FROM" != "0000000000000000000000000000000000000000" ]; then
-            npx commitlint --from "$FROM" --to "$TO"
-          fi
+          npx commitlint --from "$FROM" --to "$TO"
 
       - name: CI
         run: npm run ci
