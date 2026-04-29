@@ -1,5 +1,5 @@
 id: TASK-0005
-status: todo
+status: done
 summary: Implement Linear viewer, team, user, and workflow state discovery tools
 
 # Goal
@@ -52,12 +52,12 @@ Out of scope:
 - Do not expose `teamId` filtering in the MVP.
 
 # Acceptance Criteria
-- [ ] Agents can discover the authenticated viewer.
-- [ ] Agents can discover team IDs.
-- [ ] Agents can discover user IDs with optional text filtering.
-- [ ] Agents can discover workflow state IDs.
-- [ ] Discovery tool `content` stays short while `details` includes structured data.
-- [ ] Tool output follows the PRD `content` and `details` contract.
+- [x] Agents can discover the authenticated viewer.
+- [x] Agents can discover team IDs.
+- [x] Agents can discover user IDs with optional text filtering.
+- [x] Agents can discover workflow state IDs.
+- [x] Discovery tool `content` stays short while `details` includes structured data.
+- [x] Tool output follows the PRD `content` and `details` contract.
 
 # Testing Expectations
 - Unit-test each discovery tool with a mocked `LinearClient`.
