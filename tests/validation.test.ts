@@ -1,4 +1,4 @@
-import { isNonEmptyTrimmedString } from '../src/validation';
+import { isNonEmptyTrimmedString } from '../src/validation.js';
 
 describe('isNonEmptyTrimmedString', () => {
   it('accepts non-empty trimmed strings', () => {
