@@ -10,10 +10,10 @@ type LinearToolHelp = {
 };
 
 const linearToolHelp: LinearToolHelp[] = [
-  { name: 'linear_create_issue', requiredInputs: 'teamId, title' },
+  { name: 'linear_create_issue', requiredInputs: 'teamId, title, optional parentId' },
   { name: 'linear_read_issue', requiredInputs: 'issueId' },
   { name: 'linear_list_issues', requiredInputs: '(none)' },
-  { name: 'linear_update_issue', requiredInputs: 'issueId + at least one field to update' },
+  { name: 'linear_update_issue', requiredInputs: 'issueId + at least one field to update, optional parentId' },
   { name: 'linear_assign_issue', requiredInputs: 'issueId, assigneeId (or null to unassign)' },
   { name: 'linear_create_comment', requiredInputs: 'issueId, body' },
   { name: 'linear_list_comments', requiredInputs: 'issueId' },

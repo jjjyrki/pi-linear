@@ -54,7 +54,7 @@ describe('linear slash commands', () => {
     expect(sendMessage).toHaveBeenLastCalledWith(expect.objectContaining({
       customType: 'linear-tools',
       display: true,
-      content: expect.stringContaining('linear_create_issue: teamId, title'),
+      content: expect.stringContaining('linear_create_issue: teamId, title, optional parentId'),
     }));
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_list_workflow_states: (none)');
   });

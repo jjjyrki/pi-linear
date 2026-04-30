@@ -679,7 +679,6 @@ Decision: webhook handling is out of scope for this package.
 - Add discovery tools for labels, projects, and cycles.
 - Add team-scoped workflow state filtering.
 - Add explicit active/completed/canceled issue filters if needed.
-- Add parent issue/sub-issue support to issue create and update tools.
 - Add comment update/delete operations if teams need agents to correct their own comments.
 - Add comment reactions or resolution helpers if they become important to agent workflows.
 - Add issue search by text.

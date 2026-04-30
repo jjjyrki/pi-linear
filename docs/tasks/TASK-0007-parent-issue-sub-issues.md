@@ -1,5 +1,5 @@
 id: TASK-0007
-status: todo
+status: done
 summary: Support creating and updating Linear issues with parentId sub-issues
 
 # Goal
@@ -41,11 +41,11 @@ Out of scope:
 - Preserve existing update validation and no-op protection.
 
 # Acceptance criteria
-- [ ] Agents can create a Linear issue under an existing parent issue.
-- [ ] Agents can reparent an existing issue to a different parent.
-- [ ] Parent issue references accept UUIDs and human issue identifiers.
-- [ ] Existing issue creation and update behavior remains unchanged when no parent is provided.
-- [ ] Tool output stays on the existing `content` and `details` contract.
+- [x] Agents can create a Linear issue under an existing parent issue.
+- [x] Agents can reparent an existing issue to a different parent.
+- [x] Parent issue references accept UUIDs and human issue identifiers.
+- [x] Existing issue creation and update behavior remains unchanged when no parent is provided.
+- [x] Tool output stays on the existing `content` and `details` contract.
 
 # Testing expectations
 - Unit-test parent resolution for create and update paths.
