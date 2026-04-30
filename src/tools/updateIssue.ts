@@ -24,16 +24,18 @@ const updateIssueSchema = Type.Object({
   labelIds: Type.Optional(Type.Array(Type.String())),
   estimate: Type.Optional(Type.Union([Type.Number(), Type.Null()])),
   dueDate: Type.Optional(Type.Union([dueDateSchema, Type.Null()])),
+  parentId: Type.Optional(Type.Union([Type.String(), Type.Null()])),
 });
 
-const mutableFields = ['title', 'description', 'stateId', 'assigneeId', 'priority', 'labelIds', 'estimate', 'dueDate'] as const;
+const mutableFields = ['title', 'description', 'stateId', 'assigneeId', 'priority', 'labelIds', 'estimate', 'dueDate', 'parentId'] as const;
 
 export async function updateIssue(input: Record<string, unknown>) {
   const issueReference = requireNonEmptyString(input.issueId, 'issueId');
-  const updateInput = buildIssueUpdateInput(input);
 
   const client = getLinearClient();
   const resolved = await resolveIssue(client, issueReference);
+  const parentId = await resolveOptionalParentId(client, input.parentId);
+  const updateInput = buildIssueUpdateInput(input, { parentId });
   const payload = await client.updateIssue(resolved.id, updateInput as never);
 
   if (!payload.success) {
@@ -48,7 +50,10 @@ export async function updateIssue(input: Record<string, unknown>) {
   return normalizeIssueSummary(issue);
 }
 
-export function buildIssueUpdateInput(input: Record<string, unknown>): Record<string, unknown> {
+export function buildIssueUpdateInput(
+  input: Record<string, unknown>,
+  options?: { parentId?: string | null },
+): Record<string, unknown> {
   if (!mutableFields.some((field) => input[field] !== undefined)) {
     throw new LinearValidationError('Provide at least one mutable field to update.');
   }
@@ -69,7 +74,7 @@ export function buildIssueUpdateInput(input: Record<string, unknown>): Record<st
   const dueDate = input.dueDate === null ? null : validateDueDate(input.dueDate);
   const priority = mapPriorityInputToLinear(input.priority);
 
-  return {
+  const updateInput: Record<string, unknown> = {
     title,
     description,
     stateId,
@@ -79,12 +84,18 @@ export function buildIssueUpdateInput(input: Record<string, unknown>): Record<st
     dueDate,
     priority,
   };
+
+  if (options?.parentId !== undefined) {
+    updateInput.parentId = options.parentId;
+  }
+
+  return updateInput;
 }
 
 export const linearUpdateIssueTool = defineTool({
   name: 'linear_update_issue',
   label: 'Update Issue',
-  description: 'Update mutable fields on a Linear issue by UUID or human identifier.',
+  description: 'Update mutable fields on a Linear issue by UUID or human identifier, including optional parent reparenting.',
   parameters: updateIssueSchema,
   async execute(_toolCallId, input) {
     const issue = await updateIssue(input as Record<string, unknown>);
@@ -135,4 +146,20 @@ function optionalNullableNumber(value: unknown, fieldName: string): number | nul
     throw new LinearValidationError(`${fieldName} must be a finite number or null when provided.`);
   }
   return value;
+}
+
+async function resolveOptionalParentId(
+  client: ReturnType<typeof getLinearClient>,
+  value: unknown,
+): Promise<string | null | undefined> {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (value === null) {
+    return null;
+  }
+
+  const parentReference = requireNonEmptyString(value, 'parentId');
+  const resolvedParent = await resolveIssue(client, parentReference);
+  return resolvedParent.id;
 }

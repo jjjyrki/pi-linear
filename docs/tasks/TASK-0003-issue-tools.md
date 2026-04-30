@@ -88,3 +88,4 @@ Out of scope:
 
 # Follow-Ups
 - Add issue comment tools in `TASK-0004`.
+- Add parent issue/sub-issue support in `TASK-0007`.

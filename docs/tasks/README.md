@@ -10,5 +10,6 @@ Recommended order:
 4. `TASK-0004-comment-tools.md`
 5. `TASK-0005-discovery-tools.md`
 6. `TASK-0006-slash-commands-and-qa.md`
+7. `TASK-0007-parent-issue-sub-issues.md`
 
 Each task is intended to be reviewable on its own while building toward the MVP.

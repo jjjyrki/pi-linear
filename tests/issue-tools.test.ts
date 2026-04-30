@@ -30,6 +30,23 @@ describe('issue tools', () => {
     expect(issue).toMatchObject({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' });
   });
 
+  it('creates a sub-issue when a parent issue is supplied', async () => {
+    const issueFn = jest
+      .fn()
+      .mockResolvedValueOnce({ id: 'parent-1', identifier: 'ENG-10', title: 'Parent issue' } as never);
+    const createIssueFn = jest.fn().mockResolvedValue({
+      success: true,
+      issue: Promise.resolve({ id: 'i1', identifier: 'ENG-11', title: 'Child issue' }),
+    } as never);
+
+    getLinearClientMock.mockReturnValue({ issue: issueFn, createIssue: createIssueFn } as never);
+
+    await createIssue({ teamId: 't1', title: 'Child issue', parentId: 'ENG-10' });
+
+    expect(issueFn).toHaveBeenCalledWith('ENG-10');
+    expect(createIssueFn).toHaveBeenCalledWith(expect.objectContaining({ parentId: 'parent-1' }));
+  });
+
   it('rejects invalid create input and failed mutations', async () => {
     await expect(createIssue({ teamId: ' ', title: 'ok' })).rejects.toThrow(/teamId/i);
     await expect(createIssue({ teamId: 't1', title: '   ' })).rejects.toThrow(/title/i);
@@ -123,6 +140,30 @@ describe('issue tools', () => {
     });
 
     expect(() => buildIssueUpdateInput({ issueId: 'ENG-1' })).toThrow(LinearValidationError);
+  });
+
+  it('reparents and clears parent issues through update path', async () => {
+    const issueFn = jest.fn().mockImplementation(async (issueReference: unknown) => {
+      if (issueReference === 'ENG-10') {
+        return { id: 'parent-1', identifier: 'ENG-10', title: 'Parent issue' } as never;
+      }
+      return { id: 'i1', identifier: 'ENG-1', title: 'A' } as never;
+    });
+    const updateIssueFn = jest.fn().mockResolvedValue({
+      success: true,
+      issue: Promise.resolve({ id: 'i1', identifier: 'ENG-1', title: 'A' }),
+    } as never);
+
+    getLinearClientMock.mockReturnValue({ issue: issueFn, updateIssue: updateIssueFn } as never);
+
+    await updateIssue({ issueId: 'ENG-1', parentId: 'ENG-10' });
+    await updateIssue({ issueId: 'ENG-1', parentId: null });
+
+    expect(issueFn).toHaveBeenNthCalledWith(1, 'ENG-1');
+    expect(issueFn).toHaveBeenNthCalledWith(2, 'ENG-10');
+    expect(issueFn).toHaveBeenNthCalledWith(3, 'ENG-1');
+    expect(updateIssueFn).toHaveBeenNthCalledWith(1, 'i1', expect.objectContaining({ parentId: 'parent-1' }));
+    expect(updateIssueFn).toHaveBeenNthCalledWith(2, 'i1', expect.objectContaining({ parentId: null }));
   });
 
   it('validates update field rules and surfaces mutation failures', async () => {

@@ -3,6 +3,7 @@ import { Type } from '@mariozechner/pi-ai';
 
 import { getLinearClient } from '../client.js';
 import { LinearValidationError } from '../errors.js';
+import { resolveIssue } from '../linear/resolveIssue.js';
 import { normalizeIssueSummary, type NormalizedIssueSummary } from '../linear/shared.js';
 import { dueDateSchema, optionalTextSchema, prioritySchema } from '../schemas.js';
 import { mapPriorityInputToLinear, validateDescription, validateDueDate, validateTitle } from '../validation.js';
@@ -17,6 +18,7 @@ const createIssueSchema = Type.Object({
   labelIds: Type.Optional(Type.Array(Type.String())),
   estimate: Type.Optional(Type.Number()),
   dueDate: Type.Optional(dueDateSchema),
+  parentId: Type.Optional(Type.String()),
 });
 
 export async function createIssue(input: Record<string, unknown>): Promise<NormalizedIssueSummary> {
@@ -29,8 +31,10 @@ export async function createIssue(input: Record<string, unknown>): Promise<Norma
   const estimate = optionalNumber(input.estimate, 'estimate');
   const dueDate = validateDueDate(input.dueDate);
   const priority = mapPriorityInputToLinear(input.priority);
+  const client = getLinearClient();
+  const parentId = await resolveOptionalParentId(client, input.parentId);
 
-  const payload = await getLinearClient().createIssue({
+  const payload = await client.createIssue({
     teamId,
     title,
     description,
@@ -40,6 +44,7 @@ export async function createIssue(input: Record<string, unknown>): Promise<Norma
     labelIds,
     estimate,
     dueDate,
+    ...(parentId === undefined ? {} : { parentId }),
   });
 
   if (!payload.success) {
@@ -57,7 +62,7 @@ export async function createIssue(input: Record<string, unknown>): Promise<Norma
 export const linearCreateIssueTool = defineTool({
   name: 'linear_create_issue',
   label: 'Create Issue',
-  description: 'Create a Linear issue with required team and title and optional metadata.',
+  description: 'Create a Linear issue with required team and title, optional parent sub-issue, and optional metadata.',
   parameters: createIssueSchema,
   async execute(_toolCallId, input) {
     const issue = await createIssue(input as Record<string, unknown>);
@@ -97,4 +102,17 @@ function optionalNumber(value: unknown, fieldName: string): number | undefined {
     throw new LinearValidationError(`${fieldName} must be a finite number when provided.`);
   }
   return value;
+}
+
+async function resolveOptionalParentId(
+  client: ReturnType<typeof getLinearClient>,
+  value: unknown,
+): Promise<string | undefined> {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const parentReference = requireNonEmptyString(value, 'parentId');
+  const resolvedParent = await resolveIssue(client, parentReference);
+  return resolvedParent.id;
 }

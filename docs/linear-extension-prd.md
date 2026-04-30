@@ -44,7 +44,7 @@ The core Linear issue and comment operations should be tools, not slash commands
 
 These are Pi agent tools. They should appear in the model's available tool list through clear `description`, `promptSnippet`, and `promptGuidelines` metadata so the agent understands when to call them.
 
-The MVP exposes eleven tools: seven issue/comment tools and four discovery tools. Writes should remain ID-only except for issue references, where user-facing issue identifiers such as `ENG-123` are accepted and resolved internally to UUIDs.
+The MVP exposes eleven tools: seven issue/comment tools and four discovery tools. Writes should remain ID-only except for issue references, where user-facing issue identifiers such as `ENG-123` are accepted and resolved internally to UUIDs. Parent issue relationships use `parentId`.
 
 ### `linear_create_issue`
 Create a Linear issue.
@@ -61,6 +61,7 @@ Optional parameters:
 - `labelIds`
 - `estimate`
 - `dueDate`
+- `parentId` (optional sub-issue parent)
 
 Returns:
 - `id`
@@ -85,6 +86,7 @@ Implementation:
 - Treat `description` as raw Linear Markdown and pass it through unchanged except for string validation.
 - Reject whitespace-only descriptions. Empty string is only meaningful for updates that intentionally clear a description.
 - Convert friendly priority values to Linear's numeric priority internally.
+- Support optional `parentId` to create the issue as a sub-issue.
 
 ### `linear_read_issue`
 Read a single Linear issue.
@@ -138,6 +140,7 @@ Optional parameters:
 - `labelIds`
 - `estimate`
 - `dueDate`
+- `parentId`
 
 Returns:
 - Updated compact issue object.
@@ -150,7 +153,7 @@ Implementation:
 - Allow `description: ""` to intentionally clear the description. Reject whitespace-only descriptions.
 - Use `labelIds` as a full replacement field. Use `[]` to remove all labels; do not add append/remove label operations in the MVP.
 - Use date-only `YYYY-MM-DD` strings for `dueDate`.
-- Allow `null` only for fields with clear Linear clearing semantics, such as assignment, estimate, or due date. Keep the exact nullable set conservative during implementation.
+- Allow `null` only for fields with clear Linear clearing semantics, such as assignment, estimate, due date, or parent issue. Keep the exact nullable set conservative during implementation.
 
 ### `linear_assign_issue`
 Assign or unassign an issue.
