@@ -17,6 +17,7 @@ const linearToolHelp: LinearToolHelp[] = [
   { name: 'linear_read_issue', requiredInputs: 'issueId' },
   { name: 'linear_list_issues', requiredInputs: '(none)' },
   { name: 'linear_search_issues', requiredInputs: 'query, optional teamId/includeArchived/first' },
+  { name: 'linear_sync_task_file', requiredInputs: 'teamId, taskFilePath, optional mode/createSubtasks/linkDependencies' },
   { name: 'linear_update_issue', requiredInputs: 'issueId + at least one field to update, optional parentId' },
   { name: 'linear_assign_issue', requiredInputs: 'issueId, assigneeId (or null to unassign)' },
   { name: 'linear_create_comment', requiredInputs: 'issueId, body' },
