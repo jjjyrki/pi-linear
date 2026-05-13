@@ -13,7 +13,6 @@ import {
   validateDueDate,
   validateTitle,
 } from '../validation.js';
-import { formatIssueSummary } from './format.js';
 
 const updateIssueSchema = Type.Object({
   issueId: sharedIssueIdentifierSchema,
@@ -101,7 +100,7 @@ export const linearUpdateIssueTool = defineTool({
   async execute(_toolCallId, input) {
     const issue = await updateIssue(input as Record<string, unknown>);
     return {
-      content: [{ type: 'text', text: `Updated ${formatIssueSummary(issue)}` }],
+      content: [{ type: 'text', text: `Updated ${issue.identifier}` }],
       details: { issue },
     };
   },

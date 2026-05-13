@@ -12,7 +12,6 @@ import {
   type IssueCreatePayload,
   type ValidatedIssueCreateInput,
 } from './createIssue.js';
-import { formatIssueLine, formatIssueSummary } from './format.js';
 
 const issueInputSchema = Type.Object({
   title: Type.String(),
@@ -62,9 +61,9 @@ export const linearCreateIssueWithSubissuesTool = defineTool({
   parameters: createIssueWithSubissuesSchema,
   async execute(_toolCallId, input) {
     const result = await createIssueWithSubissues(input as Record<string, unknown>);
-    const subissueLines = result.subissues.map(formatIssueLine);
+    const subissueLines = result.subissues.map((issue) => `- ${issue.identifier}: ${issue.title} (id: ${issue.id})`);
     const text = [
-      `Created parent ${formatIssueSummary(result.parent)}`,
+      `Created parent ${result.parent.identifier}: ${result.parent.title} (id: ${result.parent.id})`,
       ...subissueLines,
     ].join('\n');
 

@@ -7,7 +7,6 @@ import { resolveIssue } from '../linear/resolveIssue.js';
 import { normalizeIssueSummary, type NormalizedIssueSummary } from '../linear/shared.js';
 import { dueDateSchema, optionalTextSchema, prioritySchema } from '../schemas.js';
 import { mapPriorityInputToLinear, validateDescription, validateDueDate, validateTitle } from '../validation.js';
-import { formatIssueSummary } from './format.js';
 
 const createIssueSchema = Type.Object({
   teamId: Type.String(),
@@ -130,7 +129,7 @@ export const linearCreateIssueTool = defineTool({
   async execute(_toolCallId, input) {
     const issue = await createIssue(input as Record<string, unknown>);
     return {
-      content: [{ type: 'text', text: `Created ${formatIssueSummary(issue)}` }],
+      content: [{ type: 'text', text: `Created ${issue.identifier}` }],
       details: { issue },
     };
   },

@@ -5,7 +5,6 @@ import { getLinearClient } from '../client.js';
 import { normalizeIssue } from '../linear/shared.js';
 import { sharedIssueIdentifierSchema } from '../schemas.js';
 import { isNonEmptyTrimmedString } from '../validation.js';
-import { formatIssueSummary } from './format.js';
 
 const readIssueSchema = Type.Object({
   issueId: sharedIssueIdentifierSchema,
@@ -33,7 +32,7 @@ export const linearReadIssueTool = defineTool({
   async execute(_toolCallId, input) {
     const issue = await readIssue(input as Record<string, unknown>);
     return {
-      content: [{ type: 'text', text: `Read ${formatIssueSummary(issue)}` }],
+      content: [{ type: 'text', text: `Read ${issue.identifier}` }],
       details: { issue },
     };
   },

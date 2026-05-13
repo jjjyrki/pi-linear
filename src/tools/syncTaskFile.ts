@@ -16,7 +16,6 @@ import { normalizeIssueSummary, normalizePageInfo, type NormalizedIssueSummary }
 import { updateIssue } from './updateIssue.js';
 import { createIssue } from './createIssue.js';
 import { createIssueRelation } from './createIssueRelation.js';
-import { formatIssueSummary } from './format.js';
 
 const syncModes = ['create_missing', 'update_existing', 'dry_run'] as const;
 type SyncMode = typeof syncModes[number];
@@ -221,7 +220,7 @@ function formatSyncResult(result: SyncTaskFileResult): string {
   const summary = [...counts.entries()]
     .map(([action, count]) => `${action}: ${count}`)
     .join(', ');
-  const parentLabel = result.parent.issue ? formatIssueSummary(result.parent.issue) : result.parent.action;
+  const parentLabel = result.parent.issue?.identifier ?? result.parent.action;
   return `Synced task file (${summary || 'no changes'}). Parent: ${parentLabel}`;
 }
 

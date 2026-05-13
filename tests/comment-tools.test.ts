@@ -133,8 +133,7 @@ describe('comment tools', () => {
     getLinearClientMock.mockReturnValue({ issue: issueFn, createComment: createCommentFn } as never);
 
     const response = await linearCreateCommentTool.execute('tool-call-id', { issueId: 'ENG-1', body: 'Looks good' }, new AbortController().signal, undefined, {} as never);
-    expect((response.content[0] as { text: string }).text).toMatch(/Added comment c1 to ENG-1/);
-    expect((response.content[0] as { text: string }).text).toContain('issue id: i1');
+    expect((response.content[0] as { text: string }).text).toMatch(/Added comment to ENG-1/);
     expect(response.details.comment.body).toBe('Looks good');
     expect(response.details.issue.identifier).toBe('ENG-1');
 
@@ -149,7 +148,6 @@ describe('comment tools', () => {
 
     const listResponse = await linearListCommentsTool.execute('tool-call-id', { issueId: 'ENG-1' }, new AbortController().signal, undefined, {} as never);
     expect((listResponse.content[0] as { text: string }).text).toMatch(/Found 1 comments/);
-    expect((listResponse.content[0] as { text: string }).text).toContain('id: c1');
     expect(listResponse.details.nodes).toHaveLength(1);
   });
 });

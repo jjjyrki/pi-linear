@@ -19,7 +19,7 @@ export const linearViewerTool = defineTool({
     const label = result.viewer.displayName ?? result.viewer.name ?? result.viewer.id;
 
     return {
-      content: [{ type: 'text', text: `Signed in as ${label} (id: ${result.viewer.id})` }],
+      content: [{ type: 'text', text: `Signed in as ${label}` }],
       details: result,
     };
   },
