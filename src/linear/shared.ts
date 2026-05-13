@@ -52,11 +52,18 @@ export type NormalizedWorkflowState = {
   team?: NormalizedTeam;
 };
 
+export type NormalizedIssueParent = {
+  id: string;
+  identifier?: string;
+  title?: string;
+};
+
 export type NormalizedIssueSummary = {
   id: string;
   identifier: string;
   title: string;
   url?: string;
+  parent?: NormalizedIssueParent;
   state?: { id: string; name: string; type?: string };
   assignee?: NormalizedUser;
   team?: NormalizedTeam;
@@ -306,6 +313,7 @@ export function normalizeIssueSummary(value: unknown): NormalizedIssueSummary {
 
   const summary: NormalizedIssueSummary = { id, identifier, title };
   const url = getString(candidate.url);
+  const parent = normalizeIssueParent(candidate.parent ?? candidate.parentId);
   const state = normalizeWorkflowStateForIssue(candidate.state ?? candidate.stateId);
   const assignee = normalizeUserSummary(candidate.assignee ?? candidate.assigneeId, { includeEmail: false });
   const team = normalizeTeamSummary(candidate.team ?? candidate.teamId);
@@ -317,6 +325,7 @@ export function normalizeIssueSummary(value: unknown): NormalizedIssueSummary {
   const updatedAt = normalizeIsoDateTime(candidate.updatedAt);
 
   if (url) summary.url = url;
+  if (parent) summary.parent = parent;
   if (state) summary.state = state;
   if (assignee) summary.assignee = assignee;
   if (team) summary.team = team;
@@ -484,6 +493,26 @@ function normalizeOptionalNumber(value: unknown): number | null | undefined {
     return null;
   }
   return typeof value === 'number' ? value : undefined;
+}
+
+function normalizeIssueParent(value: unknown): NormalizedIssueParent | undefined {
+  if (typeof value === 'string') {
+    return { id: value };
+  }
+  if (!value || typeof value !== 'object') {
+    return undefined;
+  }
+  const candidate = value as Record<string, unknown>;
+  const id = getString(candidate.id);
+  if (!id) {
+    return undefined;
+  }
+  const parent: NormalizedIssueParent = { id };
+  const identifier = getString(candidate.identifier);
+  const title = getString(candidate.title);
+  if (identifier) parent.identifier = identifier;
+  if (title) parent.title = title;
+  return parent;
 }
 
 function normalizeLabels(value: unknown): { id: string; name: string; color?: string }[] | undefined {

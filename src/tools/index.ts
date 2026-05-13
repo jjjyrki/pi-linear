@@ -9,6 +9,7 @@ import { linearListTeamsTool } from './listTeams.js';
 import { linearListUsersTool } from './listUsers.js';
 import { linearListWorkflowStatesTool } from './listWorkflowStates.js';
 import { linearReadIssueTool } from './readIssue.js';
+import { linearSearchIssuesTool } from './searchIssues.js';
 import { linearUpdateIssueTool } from './updateIssue.js';
 import { linearViewerTool } from './viewer.js';
 
@@ -16,6 +17,7 @@ export const linearToolDefinitions = [
   linearCreateIssueTool,
   linearReadIssueTool,
   linearListIssuesTool,
+  linearSearchIssuesTool,
   linearUpdateIssueTool,
   linearAssignIssueTool,
   linearCreateCommentTool,
