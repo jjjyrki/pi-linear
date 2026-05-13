@@ -12,6 +12,7 @@ type LinearToolHelp = {
 const linearToolHelp: LinearToolHelp[] = [
   { name: 'linear_create_issue', requiredInputs: 'teamId, title, optional parentId' },
   { name: 'linear_create_issues', requiredInputs: 'teamId, issues[]' },
+  { name: 'linear_create_issue_with_subissues', requiredInputs: 'teamId, parent, subissues[]' },
   { name: 'linear_read_issue', requiredInputs: 'issueId' },
   { name: 'linear_list_issues', requiredInputs: '(none)' },
   { name: 'linear_search_issues', requiredInputs: 'query, optional teamId/includeArchived/first' },
