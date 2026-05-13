@@ -1,5 +1,5 @@
 id: TASK-0002
-status: todo
+status: done
 summary: Implement shared Linear client, schemas, validation, normalizers, and issue resolution
 
 # Goal
@@ -50,11 +50,11 @@ Out of scope:
 - Return clear not-found errors.
 
 # Acceptance Criteria
-- [ ] Shared client creation works with `LINEAR_API_KEY` and fails cleanly without it.
-- [ ] Shared validators cover title, description, comments, due dates, priorities, and pagination.
-- [ ] Normalizers return the fields specified in the PRD output contract.
-- [ ] Issue resolver supports UUID and human identifier inputs.
-- [ ] No helper exposes Linear tokens.
+- [x] Shared client creation works with `LINEAR_API_KEY` and fails cleanly without it.
+- [x] Shared validators cover title, description, comments, due dates, priorities, and pagination.
+- [x] Normalizers return the fields specified in the PRD output contract.
+- [x] Issue resolver supports UUID and human identifier inputs.
+- [x] No helper exposes Linear tokens.
 
 # Testing Expectations
 - Unit-test missing and present auth configuration with mocked environment variables.
