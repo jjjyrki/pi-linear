@@ -1,5 +1,5 @@
 id: TASK-0003
-status: todo
+status: done
 summary: Implement Linear issue create, read, list, update, and assign tools
 
 # Goal
@@ -66,12 +66,12 @@ Out of scope:
 - Return a compact normalized issue summary.
 
 # Acceptance Criteria
-- [ ] Agents can create an issue with required inputs and optional metadata.
-- [ ] Agents can read an issue by UUID or human identifier.
-- [ ] Agents can list open non-archived issues with bounded pagination and stable ordering.
-- [ ] Agents can update supported fields and cannot submit no-op updates.
-- [ ] Agents can assign and unassign through the dedicated tool.
-- [ ] Tool output follows the PRD `content` and `details` contract.
+- [x] Agents can create an issue with required inputs and optional metadata.
+- [x] Agents can read an issue by UUID or human identifier.
+- [x] Agents can list open non-archived issues with bounded pagination and stable ordering.
+- [x] Agents can update supported fields and cannot submit no-op updates.
+- [x] Agents can assign and unassign through the dedicated tool.
+- [x] Tool output follows the PRD `content` and `details` contract.
 
 # Testing Expectations
 - Unit-test each issue tool with a mocked `LinearClient`.

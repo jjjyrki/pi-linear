@@ -1,5 +1,5 @@
 id: TASK-0001
-status: todo
+status: done
 summary: Scaffold the Pi Linear package and register the extension entrypoint
 
 # Goal
@@ -38,10 +38,10 @@ Out of scope:
 - Create stable module locations for client setup, schemas, errors, tool handlers, command handlers, and Linear normalization helpers.
 
 # Acceptance Criteria
-- [ ] Pi can discover the extension through the `pi.extensions` manifest.
-- [ ] `src/index.ts` registers the planned tool and command names.
-- [ ] Placeholder handlers do not call Linear or require `LINEAR_API_KEY`.
-- [ ] The package has a repeatable test command, even if tests are minimal in this phase.
+- [x] Pi can discover the extension through the `pi.extensions` manifest.
+- [x] `src/index.ts` registers the planned tool and command names.
+- [x] Placeholder handlers do not call Linear or require `LINEAR_API_KEY`.
+- [x] The package has a repeatable test command, even if tests are minimal in this phase.
 
 # Testing Expectations
 - Add a smoke test that imports the extension entrypoint and verifies it can be initialized with mocked Pi registration functions.
