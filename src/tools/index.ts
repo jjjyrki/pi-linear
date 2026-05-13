@@ -6,6 +6,7 @@ import { linearCreateIssueTool } from './createIssue.js';
 import { linearCreateIssuesTool } from './createIssues.js';
 import { linearCreateIssueRelationTool } from './createIssueRelation.js';
 import { linearCreateIssueWithSubissuesTool } from './createIssueWithSubissues.js';
+import { linearCreateTaskSubissuesFromMarkdownTool } from './createTaskSubissuesFromMarkdown.js';
 import { linearListCommentsTool } from './listComments.js';
 import { linearListIssuesTool } from './listIssues.js';
 import { linearListTeamsTool } from './listTeams.js';
@@ -22,6 +23,7 @@ export const linearToolDefinitions = [
   linearCreateIssuesTool,
   linearCreateIssueWithSubissuesTool,
   linearCreateIssueRelationTool,
+  linearCreateTaskSubissuesFromMarkdownTool,
   linearReadIssueTool,
   linearListIssuesTool,
   linearSearchIssuesTool,

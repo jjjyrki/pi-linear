@@ -61,6 +61,7 @@ describe('linear slash commands', () => {
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_create_issue_relation: issueId, relatedIssueId, type');
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_search_issues: query, optional teamId/includeArchived/first');
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_sync_task_file: teamId, taskFilePath, optional mode/createSubtasks/linkDependencies');
+    expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_create_task_subissues_from_markdown: teamId, taskFilePath, branchPrefix');
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_list_workflow_states: (none)');
   });
 
