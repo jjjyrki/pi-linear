@@ -58,6 +58,7 @@ describe('linear slash commands', () => {
     }));
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_create_issues: teamId, issues[]');
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_create_issue_with_subissues: teamId, parent, subissues[]');
+    expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_create_issue_relation: issueId, relatedIssueId, type');
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_search_issues: query, optional teamId/includeArchived/first');
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_list_workflow_states: (none)');
   });
