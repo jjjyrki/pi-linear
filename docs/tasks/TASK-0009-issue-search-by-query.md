@@ -1,5 +1,5 @@
 id: TASK-0009
-status: todo
+status: done
 summary: Add Linear issue search by title or task ID
 
 # Goal
@@ -57,11 +57,11 @@ linear_search_issues({
 - Structured output must include UUIDs for follow-up reads, updates, relations, and sub-issue creation.
 
 # Acceptance criteria
-- [ ] Agents can search by task ID text and see matching issue identifiers.
-- [ ] Agents can limit search to a team.
-- [ ] Archived issues are excluded by default and included when requested.
-- [ ] Search results include stable issue UUIDs and parent identifiers when available.
-- [ ] Existing `linear_list_issues` behavior remains unchanged.
+- [x] Agents can search by task ID text and see matching issue identifiers.
+- [x] Agents can limit search to a team.
+- [x] Archived issues are excluded by default and included when requested.
+- [x] Search results include stable issue UUIDs and parent identifiers when available.
+- [x] Existing `linear_list_issues` behavior remains unchanged.
 
 # Testing expectations
 - Unit-test required query validation.

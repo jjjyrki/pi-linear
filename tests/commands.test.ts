@@ -56,6 +56,7 @@ describe('linear slash commands', () => {
       display: true,
       content: expect.stringContaining('linear_create_issue: teamId, title, optional parentId'),
     }));
+    expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_search_issues: query, optional teamId/includeArchived/first');
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_list_workflow_states: (none)');
   });
 
