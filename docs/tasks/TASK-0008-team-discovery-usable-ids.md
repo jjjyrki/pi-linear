@@ -1,5 +1,5 @@
 id: TASK-0008
-status: todo
+status: done
 summary: Make team discovery return usable team IDs
 
 # Goal
@@ -49,10 +49,10 @@ Out of scope:
 - Return pagination metadata so callers can fetch additional pages.
 
 # Acceptance criteria
-- [ ] `linear_list_teams` visibly exposes team UUIDs, keys, and names.
-- [ ] `linear_list_teams` structured output includes `teams[].id` for every returned team.
-- [ ] Existing pagination behavior remains unchanged.
-- [ ] Agents can copy `teams[0].id` directly into `linear_create_issue.teamId`.
+- [x] `linear_list_teams` visibly exposes team UUIDs, keys, and names.
+- [x] `linear_list_teams` structured output includes `teams[].id` for every returned team.
+- [x] Existing pagination behavior remains unchanged.
+- [x] Agents can copy `teams[0].id` directly into `linear_create_issue.teamId`.
 
 # Testing expectations
 - Unit-test normalized team output includes `id`, `key`, and `name`.
