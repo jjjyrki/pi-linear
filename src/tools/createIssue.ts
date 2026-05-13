@@ -21,8 +21,44 @@ const createIssueSchema = Type.Object({
   parentId: Type.Optional(Type.String()),
 });
 
+export type ValidatedIssueCreateInput = {
+  teamId: string;
+  title: string;
+  description?: string;
+  assigneeId?: string;
+  stateId?: string;
+  priority?: number;
+  labelIds?: string[];
+  estimate?: number;
+  dueDate?: string;
+  parentReference?: string;
+};
+
+export type IssueCreatePayload = {
+  teamId: string;
+  title: string;
+  description?: string;
+  assigneeId?: string;
+  stateId?: string;
+  priority?: number;
+  labelIds?: string[];
+  estimate?: number;
+  dueDate?: string;
+  parentId?: string;
+};
+
 export async function createIssue(input: Record<string, unknown>): Promise<NormalizedIssueSummary> {
-  const teamId = requireNonEmptyString(input.teamId, 'teamId');
+  const client = getLinearClient();
+  const validated = validateIssueCreateInput(input);
+  const payload = await buildIssueCreatePayload(client, validated);
+  return createIssueWithPayload(client, payload);
+}
+
+export function validateIssueCreateInput(
+  input: Record<string, unknown>,
+  options?: { teamId?: string },
+): ValidatedIssueCreateInput {
+  const teamId = options?.teamId ?? requireNonEmptyString(input.teamId, 'teamId');
   const title = validateTitle(input.title);
   const description = validateDescription(input.description);
   const assigneeId = optionalString(input.assigneeId, 'assigneeId');
@@ -31,10 +67,9 @@ export async function createIssue(input: Record<string, unknown>): Promise<Norma
   const estimate = optionalNumber(input.estimate, 'estimate');
   const dueDate = validateDueDate(input.dueDate);
   const priority = mapPriorityInputToLinear(input.priority);
-  const client = getLinearClient();
-  const parentId = await resolveOptionalParentId(client, input.parentId);
+  const parentReference = input.parentId === undefined ? undefined : requireNonEmptyString(input.parentId, 'parentId');
 
-  const payload = await client.createIssue({
+  return {
     teamId,
     title,
     description,
@@ -44,14 +79,41 @@ export async function createIssue(input: Record<string, unknown>): Promise<Norma
     labelIds,
     estimate,
     dueDate,
-    ...(parentId === undefined ? {} : { parentId }),
-  });
+    parentReference,
+  };
+}
 
-  if (!payload.success) {
+export async function buildIssueCreatePayload(
+  client: ReturnType<typeof getLinearClient>,
+  input: ValidatedIssueCreateInput,
+): Promise<IssueCreatePayload> {
+  const parentId = await resolveOptionalParentId(client, input.parentReference);
+
+  return {
+    teamId: input.teamId,
+    title: input.title,
+    description: input.description,
+    assigneeId: input.assigneeId,
+    stateId: input.stateId,
+    priority: input.priority,
+    labelIds: input.labelIds,
+    estimate: input.estimate,
+    dueDate: input.dueDate,
+    ...(parentId === undefined ? {} : { parentId }),
+  };
+}
+
+export async function createIssueWithPayload(
+  client: ReturnType<typeof getLinearClient>,
+  payload: IssueCreatePayload,
+): Promise<NormalizedIssueSummary> {
+  const response = await client.createIssue(payload as never);
+
+  if (!response.success) {
     throw new Error('Failed to create Linear issue.');
   }
 
-  const issue = payload.issue ? await payload.issue : undefined;
+  const issue = response.issue ? await response.issue : undefined;
   if (!issue) {
     throw new Error('Linear createIssue did not return an issue.');
   }
@@ -106,13 +168,12 @@ function optionalNumber(value: unknown, fieldName: string): number | undefined {
 
 async function resolveOptionalParentId(
   client: ReturnType<typeof getLinearClient>,
-  value: unknown,
+  value: string | undefined,
 ): Promise<string | undefined> {
   if (value === undefined) {
     return undefined;
   }
 
-  const parentReference = requireNonEmptyString(value, 'parentId');
-  const resolvedParent = await resolveIssue(client, parentReference);
+  const resolvedParent = await resolveIssue(client, value);
   return resolvedParent.id;
 }
