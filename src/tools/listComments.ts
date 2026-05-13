@@ -7,6 +7,7 @@ import { resolveIssue } from '../linear/resolveIssue.js';
 import { normalizeComment, normalizePageInfo, type NormalizedComment, type NormalizedIssueSummary } from '../linear/shared.js';
 import { sharedIssueIdentifierSchema } from '../schemas.js';
 import { validatePaginationFirst } from '../validation.js';
+import { formatCommentLine } from './format.js';
 
 const listCommentsSchema = Type.Object({
   issueId: sharedIssueIdentifierSchema,
@@ -48,8 +49,12 @@ export const linearListCommentsTool = defineTool({
   parameters: listCommentsSchema,
   async execute(_toolCallId, input) {
     const result = await listComments(input as Record<string, unknown>);
+    const commentLines = result.nodes.map(formatCommentLine);
+    const text = commentLines.length > 0
+      ? [`Found ${result.nodes.length} comments on ${result.issue.identifier} (issue id: ${result.issue.id}):`, ...commentLines].join('\n')
+      : `Found 0 comments on ${result.issue.identifier} (issue id: ${result.issue.id})`;
     return {
-      content: [{ type: 'text', text: `Found ${result.nodes.length} comments on ${result.issue.identifier}` }],
+      content: [{ type: 'text', text }],
       details: result,
     };
   },

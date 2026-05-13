@@ -2,6 +2,7 @@ import { defineTool } from '@mariozechner/pi-coding-agent';
 import { Type } from '@mariozechner/pi-ai';
 
 import { sharedIssueIdentifierSchema } from '../schemas.js';
+import { formatIssueSummary } from './format.js';
 import { updateIssue } from './updateIssue.js';
 
 const assignIssueSchema = Type.Object({
@@ -24,7 +25,7 @@ export const linearAssignIssueTool = defineTool({
   async execute(_toolCallId, input) {
     const issue = await assignIssue(input as Record<string, unknown>);
     return {
-      content: [{ type: 'text', text: `${input.assigneeId == null ? 'Unassigned' : 'Assigned'} ${issue.identifier}` }],
+      content: [{ type: 'text', text: `${input.assigneeId == null ? 'Unassigned' : 'Assigned'} ${formatIssueSummary(issue)}` }],
       details: { issue },
     };
   },

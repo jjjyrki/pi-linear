@@ -5,6 +5,7 @@ import { getLinearClient } from '../client.js';
 import { LinearValidationError } from '../errors.js';
 import { normalizeDiscoveryUser, normalizePageInfo, type NormalizedUser } from '../linear/shared.js';
 import { validatePaginationFirst } from '../validation.js';
+import { formatUserLine } from './format.js';
 
 const listUsersSchema = Type.Object({
   query: Type.Optional(Type.String()),
@@ -31,9 +32,11 @@ export const linearListUsersTool = defineTool({
   parameters: listUsersSchema,
   async execute(_toolCallId, input) {
     const result = await listLinearUsers(input as Record<string, unknown>);
-    const text = typeof input.query === 'string' && input.query.trim().length > 0
-      ? `Found ${result.users.length} users matching "${input.query.trim()}"`
-      : `Found ${result.users.length} users`;
+    const heading = typeof input.query === 'string' && input.query.trim().length > 0
+      ? `Found ${result.users.length} users matching "${input.query.trim()}":`
+      : `Found ${result.users.length} users:`;
+    const userLines = result.users.map(formatUserLine);
+    const text = userLines.length > 0 ? [heading, ...userLines].join('\n') : heading.slice(0, -1);
 
     return {
       content: [{ type: 'text', text }],

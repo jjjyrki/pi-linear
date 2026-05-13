@@ -3,6 +3,7 @@ import { Type } from '@mariozechner/pi-ai';
 
 import { getLinearClient } from '../client.js';
 import { normalizeDiscoveryWorkflowState, type NormalizedWorkflowState } from '../linear/shared.js';
+import { formatWorkflowStateLine } from './format.js';
 
 const listWorkflowStatesSchema = Type.Object({});
 
@@ -35,9 +36,11 @@ export const linearListWorkflowStatesTool = defineTool({
   parameters: listWorkflowStatesSchema,
   async execute() {
     const result = await listLinearWorkflowStates();
-    const text = result.truncated
-      ? `Found ${result.workflowStates.length} workflow states (truncated at 1000)`
-      : `Found ${result.workflowStates.length} workflow states`;
+    const heading = result.truncated
+      ? `Found ${result.workflowStates.length} workflow states (truncated at 1000):`
+      : `Found ${result.workflowStates.length} workflow states:`;
+    const stateLines = result.workflowStates.map(formatWorkflowStateLine);
+    const text = stateLines.length > 0 ? [heading, ...stateLines].join('\n') : heading.slice(0, -1);
 
     return {
       content: [{ type: 'text', text }],
