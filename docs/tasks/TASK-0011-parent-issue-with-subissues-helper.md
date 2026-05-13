@@ -1,5 +1,5 @@
 id: TASK-0011
-status: todo
+status: done
 summary: Add parent issue with sub-issues creation helper
 
 # Goal
@@ -75,11 +75,11 @@ linear_create_issue_with_subissues({
 - Visible content must include the parent identifier and all sub-issue identifiers.
 
 # Acceptance criteria
-- [ ] Agents can create a parent issue and multiple sub-issues in one call.
-- [ ] Every created sub-issue is parented to the created parent issue.
-- [ ] Returned sub-issue order matches input order.
-- [ ] Output includes stable UUIDs and identifiers for parent and sub-issues.
-- [ ] Existing single and bulk create tools remain unchanged.
+- [x] Agents can create a parent issue and multiple sub-issues in one call.
+- [x] Every created sub-issue is parented to the created parent issue.
+- [x] Returned sub-issue order matches input order.
+- [x] Output includes stable UUIDs and identifiers for parent and sub-issues.
+- [x] Existing single and bulk create tools remain unchanged.
 
 # Testing expectations
 - Unit-test successful parent plus sub-issue creation.
