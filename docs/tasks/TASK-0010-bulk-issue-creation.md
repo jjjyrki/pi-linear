@@ -1,5 +1,5 @@
 id: TASK-0010
-status: todo
+status: done
 summary: Add bulk Linear issue creation
 
 # Goal
@@ -70,12 +70,12 @@ linear_create_issues({
 - Visible content must include each created issue identifier and title.
 
 # Acceptance criteria
-- [ ] Agents can create multiple issues with one tool call.
-- [ ] Agents can create multiple sub-issues under the same parent.
-- [ ] Validation failures prevent avoidable partial creation.
-- [ ] Returned issue order matches input issue order.
-- [ ] Output includes stable UUIDs for all created issues.
-- [ ] Existing `linear_create_issue` behavior remains unchanged.
+- [x] Agents can create multiple issues with one tool call.
+- [x] Agents can create multiple sub-issues under the same parent.
+- [x] Validation failures prevent avoidable partial creation.
+- [x] Returned issue order matches input issue order.
+- [x] Output includes stable UUIDs for all created issues.
+- [x] Existing `linear_create_issue` behavior remains unchanged.
 
 # Testing expectations
 - Unit-test bulk creation of two or more issues.

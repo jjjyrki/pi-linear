@@ -3,6 +3,7 @@ import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import { linearAssignIssueTool } from './assignIssue.js';
 import { linearCreateCommentTool } from './createComment.js';
 import { linearCreateIssueTool } from './createIssue.js';
+import { linearCreateIssuesTool } from './createIssues.js';
 import { linearListCommentsTool } from './listComments.js';
 import { linearListIssuesTool } from './listIssues.js';
 import { linearListTeamsTool } from './listTeams.js';
@@ -15,6 +16,7 @@ import { linearViewerTool } from './viewer.js';
 
 export const linearToolDefinitions = [
   linearCreateIssueTool,
+  linearCreateIssuesTool,
   linearReadIssueTool,
   linearListIssuesTool,
   linearSearchIssuesTool,
