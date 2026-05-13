@@ -35,6 +35,7 @@ describe('discovery tools', () => {
 
     const response = await linearViewerTool.execute('tool-call-id', {}, new AbortController().signal, undefined, {} as never);
     expect((response.content[0] as { text: string }).text).toContain('Ada Lovelace');
+    expect((response.content[0] as { text: string }).text).toContain('id: u1');
     expect(response.details.viewer.email).toBe('ada@example.com');
   });
 
@@ -111,6 +112,7 @@ describe('discovery tools', () => {
 
     const response = await linearListUsersTool.execute('tool-call-id', { query: 'ada' }, new AbortController().signal, undefined, {} as never);
     expect((response.content[0] as { text: string }).text).toMatch(/matching "ada"/i);
+    expect((response.content[0] as { text: string }).text).toContain('id: u1');
     expect(response.details.users).toHaveLength(2);
   });
 
@@ -152,7 +154,8 @@ describe('discovery tools', () => {
     } as never);
 
     const response = await linearListWorkflowStatesTool.execute('tool-call-id', {}, new AbortController().signal, undefined, {} as never);
-    expect((response.content[0] as { text: string }).text).toBe('Found 3 workflow states');
+    expect((response.content[0] as { text: string }).text).toContain('Found 3 workflow states:');
+    expect((response.content[0] as { text: string }).text).toContain('Todo (backlog | team: ENG | id: s1)');
     expect(response.details.truncated).toBe(false);
     expect(response.details.workflowStates[0].name).toBe('Todo');
   });

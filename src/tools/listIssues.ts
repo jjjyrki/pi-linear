@@ -5,6 +5,7 @@ import { getLinearClient } from '../client.js';
 import { LinearValidationError } from '../errors.js';
 import { normalizeIssueSummary, normalizePageInfo } from '../linear/shared.js';
 import { validatePaginationFirst } from '../validation.js';
+import { formatIssueLine } from './format.js';
 
 const listIssuesSchema = Type.Object({
   first: Type.Optional(Type.Number()),
@@ -57,8 +58,12 @@ export const linearListIssuesTool = defineTool({
   parameters: listIssuesSchema,
   async execute(_toolCallId, input) {
     const result = await listIssues(input as Record<string, unknown>);
+    const issueLines = result.nodes.map(formatIssueLine);
+    const text = issueLines.length > 0
+      ? [`Found ${result.nodes.length} issues:`, ...issueLines].join('\n')
+      : 'Found 0 issues';
     return {
-      content: [{ type: 'text', text: `Found ${result.nodes.length} issues` }],
+      content: [{ type: 'text', text }],
       details: result,
     };
   },

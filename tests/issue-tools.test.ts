@@ -221,4 +221,35 @@ describe('issue tools', () => {
     expect((response.content[0] as { text: string }).text).toMatch(/Created ENG-1/);
     expect(response.details.issue.identifier).toBe('ENG-1');
   });
+
+  it('read, update, and list tool output includes actionable issue IDs', async () => {
+    const { linearReadIssueTool } = await import('../src/tools/readIssue.js');
+    const { linearUpdateIssueTool } = await import('../src/tools/updateIssue.js');
+    const { linearListIssuesTool } = await import('../src/tools/listIssues.js');
+
+    getLinearClientMock.mockReturnValue({
+      issue: jest.fn().mockResolvedValue({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix', url: 'https://linear.app/issue/ENG-1' } as never),
+      updateIssue: jest.fn().mockResolvedValue({
+        success: true,
+        issue: Promise.resolve({ id: 'i1', identifier: 'ENG-1', title: 'Updated bug fix' }),
+      } as never),
+      issues: jest.fn().mockResolvedValue({
+        nodes: [{ id: 'i2', identifier: 'ENG-2', title: 'Listed issue', parent: { id: 'i1', identifier: 'ENG-1' } }],
+        pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      } as never),
+    } as never);
+
+    const readResponse = await linearReadIssueTool.execute('tool-call-id', { issueId: 'ENG-1' }, new AbortController().signal, undefined, {} as never);
+    expect((readResponse.content[0] as { text: string }).text).toContain('ENG-1: Bug fix');
+    expect((readResponse.content[0] as { text: string }).text).toContain('id: i1');
+
+    const updateResponse = await linearUpdateIssueTool.execute('tool-call-id', { issueId: 'ENG-1', title: 'Updated bug fix' }, new AbortController().signal, undefined, {} as never);
+    expect((updateResponse.content[0] as { text: string }).text).toContain('ENG-1: Updated bug fix');
+    expect((updateResponse.content[0] as { text: string }).text).toContain('id: i1');
+
+    const listResponse = await linearListIssuesTool.execute('tool-call-id', {}, new AbortController().signal, undefined, {} as never);
+    expect((listResponse.content[0] as { text: string }).text).toContain('ENG-2: Listed issue');
+    expect((listResponse.content[0] as { text: string }).text).toContain('parent: ENG-1');
+    expect((listResponse.content[0] as { text: string }).text).toContain('id: i2');
+  });
 });

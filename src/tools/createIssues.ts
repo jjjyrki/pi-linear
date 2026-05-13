@@ -1,17 +1,22 @@
-import { defineTool } from '@mariozechner/pi-coding-agent';
-import { Type } from '@mariozechner/pi-ai';
+import { defineTool } from "@mariozechner/pi-coding-agent";
+import { Type } from "@mariozechner/pi-ai";
 
-import { getLinearClient } from '../client.js';
-import { LinearValidationError } from '../errors.js';
-import { dueDateSchema, optionalTextSchema, prioritySchema } from '../schemas.js';
-import { type NormalizedIssueSummary } from '../linear/shared.js';
+import { getLinearClient } from "../client.js";
+import { LinearValidationError } from "../errors.js";
+import {
+  dueDateSchema,
+  optionalTextSchema,
+  prioritySchema,
+} from "../schemas.js";
+import { type NormalizedIssueSummary } from "../linear/shared.js";
 import {
   buildIssueCreatePayload,
   createIssueWithPayload,
   validateIssueCreateInput,
   type IssueCreatePayload,
   type ValidatedIssueCreateInput,
-} from './createIssue.js';
+} from "./createIssue.js";
+import { formatIssueLine } from "./format.js";
 
 const bulkIssueSchema = Type.Object({
   title: Type.String(),
@@ -34,12 +39,16 @@ export type BulkCreateIssuesResult = {
   issues: NormalizedIssueSummary[];
 };
 
-export async function createIssues(input: Record<string, unknown>): Promise<BulkCreateIssuesResult> {
-  const teamId = requireNonEmptyString(input.teamId, 'teamId');
+export async function createIssues(
+  input: Record<string, unknown>,
+): Promise<BulkCreateIssuesResult> {
+  const teamId = requireNonEmptyString(input.teamId, "teamId");
   const issueInputs = validateIssueArray(input.issues);
   const client = getLinearClient();
 
-  const validated = issueInputs.map((issueInput) => validateIssueCreateInput(issueInput, { teamId }));
+  const validated = issueInputs.map((issueInput) =>
+    validateIssueCreateInput(issueInput, { teamId }),
+  );
   const payloads: IssueCreatePayload[] = [];
   for (const issueInput of validated) {
     payloads.push(await buildIssueCreatePayload(client, issueInput));
@@ -58,17 +67,21 @@ export async function createIssues(input: Record<string, unknown>): Promise<Bulk
 }
 
 export const linearCreateIssuesTool = defineTool({
-  name: 'linear_create_issues',
-  label: 'Create Issues',
-  description: 'Create multiple Linear issues with one shared team ID and optional metadata.',
+  name: "linear_create_issues",
+  label: "Create Issues",
+  description:
+    "Create multiple Linear issues with one shared team ID and optional metadata.",
   parameters: createIssuesSchema,
   async execute(_toolCallId, input) {
     const result = await createIssues(input as Record<string, unknown>);
-    const issueLines = result.issues.map((issue) => `- ${issue.identifier}: ${issue.title} (id: ${issue.id})`);
-    const text = [`Created ${result.issues.length} issues:`, ...issueLines].join('\n');
+    const issueLines = result.issues.map(formatIssueLine);
+    const text = [
+      `Created ${result.issues.length} issues:`,
+      ...issueLines,
+    ].join("\n");
 
     return {
-      content: [{ type: 'text', text }],
+      content: [{ type: "text", text }],
       details: result,
     };
   },
@@ -76,16 +89,20 @@ export const linearCreateIssuesTool = defineTool({
 
 function validateIssueArray(value: unknown): Record<string, unknown>[] {
   if (!Array.isArray(value) || value.length === 0) {
-    throw new LinearValidationError('issues must be a non-empty array.');
+    throw new LinearValidationError("issues must be a non-empty array.");
   }
-  if (value.some((issue) => !issue || typeof issue !== 'object' || Array.isArray(issue))) {
-    throw new LinearValidationError('issues must contain issue input objects.');
+  if (
+    value.some(
+      (issue) => !issue || typeof issue !== "object" || Array.isArray(issue),
+    )
+  ) {
+    throw new LinearValidationError("issues must contain issue input objects.");
   }
   return value as Record<string, unknown>[];
 }
 
 function requireNonEmptyString(value: unknown, fieldName: string): string {
-  if (typeof value !== 'string' || value.trim().length === 0) {
+  if (typeof value !== "string" || value.trim().length === 0) {
     throw new LinearValidationError(`${fieldName} must be a non-empty string.`);
   }
   return value;
@@ -97,15 +114,18 @@ function createBulkCreateError(
   index: number,
   created: NormalizedIssueSummary[],
 ): Error {
-  const createdContext = created.length > 0
-    ? ` Created before failure: ${created.map((issue) => issue.identifier).join(', ')}.`
-    : '';
-  return new Error(`Failed to create issue ${index + 1} (${failedInput.title}): ${getErrorMessage(error)}.${createdContext}`);
+  const createdContext =
+    created.length > 0
+      ? ` Created before failure: ${created.map((issue) => issue.identifier).join(", ")}.`
+      : "";
+  return new Error(
+    `Failed to create issue ${index + 1} (${failedInput.title}): ${getErrorMessage(error)}.${createdContext}`,
+  );
 }
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message.trim().length > 0) {
     return error.message;
   }
-  return 'unknown error';
+  return "unknown error";
 }

@@ -1,8 +1,8 @@
-import { defineTool } from '@mariozechner/pi-coding-agent';
-import { Type } from '@mariozechner/pi-ai';
+import { defineTool } from "@mariozechner/pi-coding-agent";
+import { Type } from "@mariozechner/pi-ai";
 
-import { getLinearClient } from '../client.js';
-import { LinearValidationError } from '../errors.js';
+import { getLinearClient } from "../client.js";
+import { LinearValidationError } from "../errors.js";
 import {
   buildParentIssueDescription,
   buildParentIssueTitle,
@@ -11,15 +11,25 @@ import {
   parseTaskMarkdownFile,
   type ParsedTaskFile,
   type ParsedTaskSubTask,
-} from '../taskFiles.js';
-import { normalizeIssueSummary, normalizePageInfo, type NormalizedIssueSummary } from '../linear/shared.js';
-import { updateIssue } from './updateIssue.js';
-import { createIssue } from './createIssue.js';
-import { createIssueRelation } from './createIssueRelation.js';
+} from "../taskFiles.js";
+import {
+  normalizeIssueSummary,
+  normalizePageInfo,
+  type NormalizedIssueSummary,
+} from "../linear/shared.js";
+import { updateIssue } from "./updateIssue.js";
+import { createIssue } from "./createIssue.js";
+import { createIssueRelation } from "./createIssueRelation.js";
+import { formatIssueSummary } from "./format.js";
 
-const syncModes = ['create_missing', 'update_existing', 'dry_run'] as const;
-type SyncMode = typeof syncModes[number];
-type SyncAction = 'created' | 'updated' | 'unchanged' | 'would_create' | 'would_update';
+const syncModes = ["create_missing", "update_existing", "dry_run"] as const;
+type SyncMode = (typeof syncModes)[number];
+type SyncAction =
+  | "created"
+  | "updated"
+  | "unchanged"
+  | "would_create"
+  | "would_update";
 
 export type SyncTaskFileResult = {
   parent: SyncIssueResult;
@@ -37,7 +47,7 @@ export type SyncSubissueResult = SyncIssueResult & {
 };
 
 export type SyncRelationResult = {
-  action: 'created' | 'unchanged' | 'would_create';
+  action: "created" | "unchanged" | "would_create";
   issueKey: string;
   blockedBy: string[];
 };
@@ -50,12 +60,19 @@ const syncTaskFileSchema = Type.Object({
   linkDependencies: Type.Optional(Type.Boolean()),
 });
 
-export async function syncTaskFile(input: Record<string, unknown>): Promise<SyncTaskFileResult> {
-  const teamId = requireNonEmptyString(input.teamId, 'teamId');
-  const taskFilePath = requireNonEmptyString(input.taskFilePath, 'taskFilePath');
+export async function syncTaskFile(
+  input: Record<string, unknown>,
+): Promise<SyncTaskFileResult> {
+  const teamId = requireNonEmptyString(input.teamId, "teamId");
+  const taskFilePath = requireNonEmptyString(
+    input.taskFilePath,
+    "taskFilePath",
+  );
   const mode = validateMode(input.mode);
-  const createSubtasks = optionalBoolean(input.createSubtasks, 'createSubtasks') ?? true;
-  const linkDependencies = optionalBoolean(input.linkDependencies, 'linkDependencies') ?? false;
+  const createSubtasks =
+    optionalBoolean(input.createSubtasks, "createSubtasks") ?? true;
+  const linkDependencies =
+    optionalBoolean(input.linkDependencies, "linkDependencies") ?? false;
   const task = await parseTaskMarkdownFile(taskFilePath);
 
   const parent = await syncParentIssue(task, teamId, mode);
@@ -65,48 +82,60 @@ export async function syncTaskFile(input: Record<string, unknown>): Promise<Sync
   const result: SyncTaskFileResult = { parent, subissues };
 
   if (linkDependencies) {
-    result.relations = await syncDependencyRelations(task, mode, parent, subissues);
+    result.relations = await syncDependencyRelations(
+      task,
+      mode,
+      parent,
+      subissues,
+    );
   }
 
   return result;
 }
 
 export const linearSyncTaskFileTool = defineTool({
-  name: 'linear_sync_task_file',
-  label: 'Sync Task File',
-  description: 'Idempotently sync a local markdown task file to Linear issues.',
+  name: "linear_sync_task_file",
+  label: "Sync Task File",
+  description: "Idempotently sync a local markdown task file to Linear issues.",
   parameters: syncTaskFileSchema,
   async execute(_toolCallId, input) {
     const result = await syncTaskFile(input as Record<string, unknown>);
     return {
-      content: [{ type: 'text', text: formatSyncResult(result) }],
+      content: [{ type: "text", text: formatSyncResult(result) }],
       details: result,
     };
   },
 });
 
-async function syncParentIssue(task: ParsedTaskFile, teamId: string, mode: SyncMode): Promise<SyncIssueResult> {
+async function syncParentIssue(
+  task: ParsedTaskFile,
+  teamId: string,
+  mode: SyncMode,
+): Promise<SyncIssueResult> {
   const existing = await findIssueByTaskKey(teamId, task.id);
   const title = buildParentIssueTitle(task);
   const description = buildParentIssueDescription(task);
 
   if (!existing) {
-    if (mode === 'dry_run') {
-      return { action: 'would_create' };
+    if (mode === "dry_run") {
+      return { action: "would_create" };
     }
     return {
-      action: 'created',
+      action: "created",
       issue: await createIssue({ teamId, title, description }),
     };
   }
 
-  if (mode === 'dry_run') {
-    return { action: 'would_update', issue: existing };
+  if (mode === "dry_run") {
+    return { action: "would_update", issue: existing };
   }
-  if (mode === 'update_existing') {
-    return { action: 'updated', issue: await updateIssue({ issueId: existing.id, description }) };
+  if (mode === "update_existing") {
+    return {
+      action: "updated",
+      issue: await updateIssue({ issueId: existing.id, description }),
+    };
   }
-  return { action: 'unchanged', issue: existing };
+  return { action: "unchanged", issue: existing };
 }
 
 async function syncSubissues(
@@ -123,27 +152,42 @@ async function syncSubissues(
     const description = buildSubTaskIssueDescription(task, subTask);
 
     if (!existing) {
-      if (mode === 'dry_run') {
-        results.push({ key: subTask.key, action: 'would_create' });
+      if (mode === "dry_run") {
+        results.push({ key: subTask.key, action: "would_create" });
         continue;
       }
       if (!parentIssue) {
-        throw new LinearValidationError(`Cannot create sub-task ${subTask.key} without a parent issue.`);
+        throw new LinearValidationError(
+          `Cannot create sub-task ${subTask.key} without a parent issue.`,
+        );
       }
       results.push({
         key: subTask.key,
-        action: 'created',
-        issue: await createIssue({ teamId, title, description, parentId: parentIssue.id }),
+        action: "created",
+        issue: await createIssue({
+          teamId,
+          title,
+          description,
+          parentId: parentIssue.id,
+        }),
       });
       continue;
     }
 
-    if (mode === 'dry_run') {
-      results.push({ key: subTask.key, action: 'would_update', issue: existing });
-    } else if (mode === 'update_existing') {
-      results.push({ key: subTask.key, action: 'updated', issue: await updateIssue({ issueId: existing.id, description }) });
+    if (mode === "dry_run") {
+      results.push({
+        key: subTask.key,
+        action: "would_update",
+        issue: existing,
+      });
+    } else if (mode === "update_existing") {
+      results.push({
+        key: subTask.key,
+        action: "updated",
+        issue: await updateIssue({ issueId: existing.id, description }),
+      });
     } else {
-      results.push({ key: subTask.key, action: 'unchanged', issue: existing });
+      results.push({ key: subTask.key, action: "unchanged", issue: existing });
     }
   }
 
@@ -172,30 +216,51 @@ async function syncDependencyRelations(
       continue;
     }
 
-    if (mode === 'dry_run') {
-      relations.push({ action: 'would_create', issueKey: subTask.key, blockedBy: subTask.blockedBy });
+    if (mode === "dry_run") {
+      relations.push({
+        action: "would_create",
+        issueKey: subTask.key,
+        blockedBy: subTask.blockedBy,
+      });
       continue;
     }
 
     const issue = issueByKey.get(subTask.key);
     if (!issue) {
-      relations.push({ action: 'unchanged', issueKey: subTask.key, blockedBy: subTask.blockedBy });
+      relations.push({
+        action: "unchanged",
+        issueKey: subTask.key,
+        blockedBy: subTask.blockedBy,
+      });
       continue;
     }
 
-    const availableDependencies = subTask.blockedBy.filter((dependency) => issueByKey.has(dependency));
+    const availableDependencies = subTask.blockedBy.filter((dependency) =>
+      issueByKey.has(dependency),
+    );
     for (const dependency of availableDependencies) {
       const dependencyIssue = issueByKey.get(dependency);
       if (!dependencyIssue) continue;
-      await createIssueRelation({ issueId: issue.id, relatedIssueId: dependencyIssue.id, type: 'blocked_by' });
+      await createIssueRelation({
+        issueId: issue.id,
+        relatedIssueId: dependencyIssue.id,
+        type: "blocked_by",
+      });
     }
-    relations.push({ action: availableDependencies.length > 0 ? 'created' : 'unchanged', issueKey: subTask.key, blockedBy: subTask.blockedBy });
+    relations.push({
+      action: availableDependencies.length > 0 ? "created" : "unchanged",
+      issueKey: subTask.key,
+      blockedBy: subTask.blockedBy,
+    });
   }
 
   return relations;
 }
 
-async function findIssueByTaskKey(teamId: string, taskKey: string): Promise<NormalizedIssueSummary | undefined> {
+async function findIssueByTaskKey(
+  teamId: string,
+  taskKey: string,
+): Promise<NormalizedIssueSummary | undefined> {
   const result = await getLinearClient().searchIssues(taskKey, {
     first: 25,
     includeArchived: false,
@@ -203,9 +268,13 @@ async function findIssueByTaskKey(teamId: string, taskKey: string): Promise<Norm
   } as never);
   // Normalize pageInfo here to keep mocked SDK shape coverage aligned with other list/search tools.
   if (result.pageInfo) normalizePageInfo(result.pageInfo);
-  const normalized = (result.nodes ?? []).map((issue) => normalizeIssueSummary(issue));
+  const normalized = (result.nodes ?? []).map((issue) =>
+    normalizeIssueSummary(issue),
+  );
   const normalizedTaskKey = taskKey.toLowerCase();
-  return normalized.find((issue) => issue.title.toLowerCase().includes(normalizedTaskKey));
+  return normalized.find((issue) =>
+    issue.title.toLowerCase().includes(normalizedTaskKey),
+  );
 }
 
 function formatSyncResult(result: SyncTaskFileResult): string {
@@ -214,18 +283,23 @@ function formatSyncResult(result: SyncTaskFileResult): string {
     counts.set(item.action, (counts.get(item.action) ?? 0) + 1);
   }
   for (const relation of result.relations ?? []) {
-    counts.set(`relation_${relation.action}`, (counts.get(`relation_${relation.action}`) ?? 0) + 1);
+    counts.set(
+      `relation_${relation.action}`,
+      (counts.get(`relation_${relation.action}`) ?? 0) + 1,
+    );
   }
 
   const summary = [...counts.entries()]
     .map(([action, count]) => `${action}: ${count}`)
-    .join(', ');
-  const parentLabel = result.parent.issue?.identifier ?? result.parent.action;
-  return `Synced task file (${summary || 'no changes'}). Parent: ${parentLabel}`;
+    .join(", ");
+  const parentLabel = result.parent.issue
+    ? formatIssueSummary(result.parent.issue)
+    : result.parent.action;
+  return `Synced task file (${summary || "no changes"}). Parent: ${parentLabel}`;
 }
 
 function requireNonEmptyString(value: unknown, fieldName: string): string {
-  if (typeof value !== 'string' || value.trim().length === 0) {
+  if (typeof value !== "string" || value.trim().length === 0) {
     throw new LinearValidationError(`${fieldName} must be a non-empty string.`);
   }
   return value.trim();
@@ -233,18 +307,25 @@ function requireNonEmptyString(value: unknown, fieldName: string): string {
 
 function validateMode(value: unknown): SyncMode {
   if (value === undefined) {
-    return 'dry_run';
+    return "dry_run";
   }
-  if (typeof value !== 'string' || !syncModes.includes(value as SyncMode)) {
-    throw new LinearValidationError('mode must be one of create_missing, update_existing, or dry_run.');
+  if (typeof value !== "string" || !syncModes.includes(value as SyncMode)) {
+    throw new LinearValidationError(
+      "mode must be one of create_missing, update_existing, or dry_run.",
+    );
   }
   return value as SyncMode;
 }
 
-function optionalBoolean(value: unknown, fieldName: string): boolean | undefined {
+function optionalBoolean(
+  value: unknown,
+  fieldName: string,
+): boolean | undefined {
   if (value === undefined) return undefined;
-  if (typeof value !== 'boolean') {
-    throw new LinearValidationError(`${fieldName} must be a boolean when provided.`);
+  if (typeof value !== "boolean") {
+    throw new LinearValidationError(
+      `${fieldName} must be a boolean when provided.`,
+    );
   }
   return value;
 }
