@@ -1,5 +1,5 @@
 id: TASK-0013
-status: todo
+status: done
 summary: Add idempotent Linear sync from task markdown files
 
 # Goal
@@ -92,12 +92,12 @@ linear_sync_task_file({
 - Visible content must summarize created, updated, unchanged, and dry-run planned work.
 
 # Acceptance criteria
-- [ ] Re-running sync does not create duplicate parent issues.
-- [ ] Re-running sync does not create duplicate sub-issues.
-- [ ] `dry_run` reports planned work without mutations.
-- [ ] `create_missing` creates only missing parent/sub-issues and preserves existing descriptions.
-- [ ] `update_existing` updates descriptions without changing state, assignee, or comments.
-- [ ] `linkDependencies` creates native Linear dependency relations when dependencies are parsed.
+- [x] Re-running sync does not create duplicate parent issues.
+- [x] Re-running sync does not create duplicate sub-issues.
+- [x] `dry_run` reports planned work without mutations.
+- [x] `create_missing` creates only missing parent/sub-issues and preserves existing descriptions.
+- [x] `update_existing` updates descriptions without changing state, assignee, or comments.
+- [x] `linkDependencies` creates native Linear dependency relations when dependencies are parsed.
 
 # Testing expectations
 - Unit-test task header parsing.
