@@ -1,5 +1,5 @@
 id: TASK-0015
-status: todo
+status: done
 summary: Add markdown task sub-issue creation with branch guidance
 
 # Goal
@@ -77,11 +77,11 @@ Branch order / PR guidance:
 - Visible content must include created issue identifiers and preferred branch names.
 
 # Acceptance criteria
-- [ ] Agents can create sub-issues from a markdown task file with generated branch guidance.
-- [ ] Generated branch names are deterministic and safe.
-- [ ] Dependency-aware base branch guidance is included when dependencies are parsed.
-- [ ] Guidance defaults to latest `main` when no dependencies exist.
-- [ ] Output includes issue UUIDs, identifiers, and preferred branches.
+- [x] Agents can create sub-issues from a markdown task file with generated branch guidance.
+- [x] Generated branch names are deterministic and safe.
+- [x] Dependency-aware base branch guidance is included when dependencies are parsed.
+- [x] Guidance defaults to latest `main` when no dependencies exist.
+- [x] Output includes issue UUIDs, identifiers, and preferred branches.
 
 # Testing expectations
 - Unit-test branch slug generation.
