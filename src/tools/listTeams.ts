@@ -29,12 +29,22 @@ export const linearListTeamsTool = defineTool({
   parameters: listTeamsSchema,
   async execute(_toolCallId, input) {
     const result = await listLinearTeams(input as Record<string, unknown>);
+    const teamLines = result.teams.map(formatTeamLine);
+    const text = teamLines.length > 0
+      ? [`Found ${result.teams.length} teams:`, ...teamLines].join('\n')
+      : 'Found 0 teams';
+
     return {
-      content: [{ type: 'text', text: `Found ${result.teams.length} teams` }],
+      content: [{ type: 'text', text }],
       details: result,
     };
   },
 });
+
+function formatTeamLine(team: NormalizedTeam): string {
+  const label = [team.key, team.name].filter(Boolean).join(' — ') || 'Unnamed team';
+  return `- ${label} (id: ${team.id})`;
+}
 
 function optionalString(value: unknown, fieldName: string): string | undefined {
   if (value === undefined) return undefined;

@@ -61,8 +61,25 @@ describe('discovery tools', () => {
     await expect(listLinearTeams({ first: 101 })).rejects.toThrow(/at most 100/i);
 
     const response = await linearListTeamsTool.execute('tool-call-id', {}, new AbortController().signal, undefined, {} as never);
-    expect((response.content[0] as { text: string }).text).toBe('Found 2 teams');
-    expect(response.details.teams[0].key).toBe('ENG');
+    const text = (response.content[0] as { text: string }).text;
+    expect(text).toContain('Found 2 teams:');
+    expect(text).toContain('ENG — Engineering (id: t1)');
+    expect(text).toContain('OPS — Operations (id: t2)');
+    expect(response.details.teams[0]).toMatchObject({ id: 't1', key: 'ENG', name: 'Engineering' });
+  });
+
+  it('lists teams with IDs when optional SDK fields are missing', async () => {
+    const teamsFn = jest.fn().mockResolvedValue({
+      nodes: [{ id: 't1' }],
+      pageInfo: { hasNextPage: false, hasPreviousPage: false },
+    } as never);
+
+    getLinearClientMock.mockReturnValue({ teams: teamsFn } as never);
+
+    const response = await linearListTeamsTool.execute('tool-call-id', {}, new AbortController().signal, undefined, {} as never);
+    const text = (response.content[0] as { text: string }).text;
+    expect(text).toContain('Unnamed team (id: t1)');
+    expect(response.details.teams[0]).toEqual({ id: 't1' });
   });
 
   it('lists users with optional query filtering and pagination validation', async () => {
