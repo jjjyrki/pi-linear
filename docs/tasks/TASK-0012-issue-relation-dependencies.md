@@ -1,5 +1,5 @@
 id: TASK-0012
-status: todo
+status: done
 summary: Add Linear issue relation and dependency creation
 
 # Goal
@@ -69,11 +69,11 @@ linear_create_issue_relation({
 - Visible content must state the created relationship using issue identifiers.
 
 # Acceptance criteria
-- [ ] Agents can create a blocking relationship between two issues.
-- [ ] Agents can create a related issue relationship between two issues.
-- [ ] Issue references accept UUIDs and human-readable identifiers.
-- [ ] Output includes stable relation and issue IDs.
-- [ ] Invalid relation types are rejected before mutation.
+- [x] Agents can create a blocking relationship between two issues.
+- [x] Agents can create a related issue relationship between two issues.
+- [x] Issue references accept UUIDs and human-readable identifiers.
+- [x] Output includes stable relation and issue IDs.
+- [x] Invalid relation types are rejected before mutation.
 
 # Testing expectations
 - Unit-test relation type validation.
