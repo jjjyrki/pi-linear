@@ -49,8 +49,9 @@ export const linearCreateCommentTool = defineTool({
   parameters: createCommentSchema,
   async execute(_toolCallId, input) {
     const result = await createComment(input as Record<string, unknown>);
+    const urlSuffix = result.comment.url ? `: ${result.comment.url}` : '';
     return {
-      content: [{ type: 'text', text: result.comment.url ? `Added comment to ${result.issue.identifier}: ${result.comment.url}` : `Added comment to ${result.issue.identifier}` }],
+      content: [{ type: 'text', text: `Added comment ${result.comment.id} to ${result.issue.identifier} (issue id: ${result.issue.id})${urlSuffix}` }],
       details: result,
     };
   },

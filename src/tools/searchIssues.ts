@@ -5,6 +5,7 @@ import { getLinearClient } from '../client.js';
 import { LinearValidationError } from '../errors.js';
 import { normalizeIssueSummary, normalizePageInfo, type NormalizedIssueSummary, type NormalizedPageInfo } from '../linear/shared.js';
 import { validatePaginationFirst } from '../validation.js';
+import { formatIssueLine } from './format.js';
 
 const searchIssuesSchema = Type.Object({
   query: Type.String(),
@@ -64,12 +65,6 @@ export const linearSearchIssuesTool = defineTool({
     };
   },
 });
-
-function formatIssueLine(issue: NormalizedIssueSummary): string {
-  const parent = issue.parent?.identifier ? ` parent: ${issue.parent.identifier}` : undefined;
-  const suffix = [issue.url, parent, `id: ${issue.id}`].filter(Boolean).join(' | ');
-  return `- ${issue.identifier}: ${issue.title}${suffix ? ` (${suffix})` : ''}`;
-}
 
 function requireTrimmedString(value: unknown, fieldName: string): string {
   if (typeof value !== 'string' || value.trim().length === 0) {

@@ -1,5 +1,5 @@
 id: TASK-0014
-status: todo
+status: done
 summary: Standardize Linear tool output with actionable objects
 
 # Goal
@@ -54,11 +54,11 @@ For create, update, read, list, search, and bulk issue outputs, include where av
 - Keep visible text short enough for agent logs.
 
 # Acceptance criteria
-- [ ] Every Linear tool returns stable UUIDs in structured output for the primary objects it reads or mutates.
-- [ ] Issue outputs include identifier, title, URL, parent identifier, team key/name, and state name when available.
-- [ ] Visible content for list/discovery tools includes usable IDs, not only counts.
-- [ ] Existing consumers of current `details` fields remain compatible or receive a documented migration note.
-- [ ] Tests cover the standardized output for each affected tool family.
+- [x] Every Linear tool returns stable UUIDs in structured output for the primary objects it reads or mutates.
+- [x] Issue outputs include identifier, title, URL, parent identifier, team key/name, and state name when available.
+- [x] Visible content for list/discovery tools includes usable IDs, not only counts.
+- [x] Existing consumers of current `details` fields remain compatible or receive a documented migration note.
+- [x] Tests cover the standardized output for each affected tool family.
 
 # Testing expectations
 - Unit-test normalized issue summaries include parent, team, and state metadata when available.

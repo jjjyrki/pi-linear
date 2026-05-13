@@ -12,6 +12,7 @@ import {
   type IssueCreatePayload,
   type ValidatedIssueCreateInput,
 } from './createIssue.js';
+import { formatIssueLine } from './format.js';
 
 const bulkIssueSchema = Type.Object({
   title: Type.String(),
@@ -64,7 +65,7 @@ export const linearCreateIssuesTool = defineTool({
   parameters: createIssuesSchema,
   async execute(_toolCallId, input) {
     const result = await createIssues(input as Record<string, unknown>);
-    const issueLines = result.issues.map((issue) => `- ${issue.identifier}: ${issue.title} (id: ${issue.id})`);
+    const issueLines = result.issues.map(formatIssueLine);
     const text = [`Created ${result.issues.length} issues:`, ...issueLines].join('\n');
 
     return {
