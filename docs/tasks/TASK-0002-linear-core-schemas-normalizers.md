@@ -1,5 +1,5 @@
 id: TASK-0002
-status: todo
+status: done
 summary: Implement shared Linear client, schemas, validation, normalizers, and issue resolution
 
 # Goal

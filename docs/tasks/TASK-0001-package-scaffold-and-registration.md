@@ -1,5 +1,5 @@
 id: TASK-0001
-status: todo
+status: done
 summary: Scaffold the Pi Linear package and register the extension entrypoint
 
 # Goal

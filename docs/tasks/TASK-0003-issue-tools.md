@@ -1,5 +1,5 @@
 id: TASK-0003
-status: todo
+status: done
 summary: Implement Linear issue create, read, list, update, and assign tools
 
 # Goal
