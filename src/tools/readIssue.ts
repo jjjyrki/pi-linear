@@ -29,6 +29,8 @@ export const linearReadIssueTool = defineTool({
   name: 'linear_read_issue',
   label: 'Read Issue',
   description: 'Read a Linear issue by UUID or human identifier (e.g. ENG-123).',
+  promptSnippet: 'Read one issue',
+  promptGuidelines: ['Use linear_read_issue when you have the issue ID or key.'],
   parameters: readIssueSchema,
   async execute(_toolCallId, input) {
     const issue = await readIssue(input as Record<string, unknown>);

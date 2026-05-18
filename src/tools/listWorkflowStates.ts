@@ -33,6 +33,8 @@ export const linearListWorkflowStatesTool = defineTool({
   name: 'linear_list_workflow_states',
   label: 'List Workflow States',
   description: 'List up to 1000 Linear workflow states so agents can discover state IDs.',
+  promptSnippet: 'List workflow states',
+  promptGuidelines: ['Use linear_list_workflow_states when stateId is unknown.'],
   parameters: listWorkflowStatesSchema,
   async execute() {
     const result = await listLinearWorkflowStates();

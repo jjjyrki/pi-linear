@@ -46,6 +46,8 @@ export const linearCreateCommentTool = defineTool({
   name: 'linear_create_comment',
   label: 'Create Comment',
   description: 'Create a comment or threaded reply on a Linear issue.',
+  promptSnippet: 'Comment on an issue',
+  promptGuidelines: ['Use linear_create_comment for issue updates; read/list comments first if context matters.'],
   parameters: createCommentSchema,
   async execute(_toolCallId, input) {
     const result = await createComment(input as Record<string, unknown>);

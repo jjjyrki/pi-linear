@@ -13,6 +13,8 @@ export const linearViewerTool = defineTool({
   name: 'linear_viewer',
   label: 'Viewer',
   description: 'Read the authenticated Linear user.',
+  promptSnippet: 'Show current user',
+  promptGuidelines: ['Use linear_viewer to identify the authenticated Linear user.'],
   parameters: Type.Object({}),
   async execute(_toolCallId) {
     const result = await viewLinearUser();

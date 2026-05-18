@@ -126,6 +126,8 @@ export const linearCreateIssueTool = defineTool({
   name: 'linear_create_issue',
   label: 'Create Issue',
   description: 'Create a Linear issue with required team and title, optional parent sub-issue, and optional metadata.',
+  promptSnippet: 'Create one issue',
+  promptGuidelines: ['Use linear_create_issue only after resolving teamId and checking for duplicates.'],
   parameters: createIssueSchema,
   async execute(_toolCallId, input) {
     const issue = await createIssue(input as Record<string, unknown>);

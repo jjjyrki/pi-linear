@@ -63,6 +63,8 @@ export const linearCreateIssueRelationTool = defineTool({
   name: 'linear_create_issue_relation',
   label: 'Create Issue Relation',
   description: 'Create a Linear relationship between two issues.',
+  promptSnippet: 'Relate two issues',
+  promptGuidelines: ['Use linear_create_issue_relation after confirming both issue IDs.'],
   parameters: createIssueRelationSchema,
   async execute(_toolCallId, input) {
     const result = await createIssueRelation(input as Record<string, unknown>);

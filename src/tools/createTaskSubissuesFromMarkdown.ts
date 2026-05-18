@@ -73,6 +73,8 @@ export const linearCreateTaskSubissuesFromMarkdownTool = defineTool({
   name: 'linear_create_task_subissues_from_markdown',
   label: 'Create Task Sub-Issues From Markdown',
   description: 'Create Linear sub-issues from a markdown task file with optional branch guidance.',
+  promptSnippet: 'Create task-file sub-issues',
+  promptGuidelines: ['Use linear_create_task_subissues_from_markdown only after confirming the parent issue.'],
   parameters: createTaskSubissuesFromMarkdownSchema,
   async execute(_toolCallId, input) {
     const result = await createTaskSubissuesFromMarkdown(input as Record<string, unknown>);

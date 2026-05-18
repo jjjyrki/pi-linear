@@ -1,5 +1,5 @@
 id: TASK-0017
-status: todo
+status: done
 summary: Add agent-oriented prompt metadata to all Linear tools
 
 # Goal
@@ -31,11 +31,11 @@ Write tools must warn agents to resolve ambiguous IDs before mutating Linear dat
 Task-file, bulk-create, relation, and subissue tools must include guidance for planning/decomposition workflows.
 
 # Acceptance criteria
-- [ ] Every Linear tool has prompt metadata where Pi supports it.
-- [ ] Metadata distinguishes discovery, read, mutation, bulk, and sync workflows.
-- [ ] Mutation tools include concise safety guidance.
-- [ ] Tests or snapshots verify that all registered tools include required metadata fields.
-- [ ] Existing tests and build still pass.
+- [x] Every Linear tool has prompt metadata where Pi supports it.
+- [x] Metadata distinguishes discovery, read, mutation, bulk, and sync workflows.
+- [x] Mutation tools include concise safety guidance.
+- [x] Tests or snapshots verify that all registered tools include required metadata fields.
+- [x] Existing tests and build still pass.
 
 # Testing expectations
 - Run `npm run ci`.

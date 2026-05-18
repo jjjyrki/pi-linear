@@ -29,6 +29,8 @@ export const linearListUsersTool = defineTool({
   name: 'linear_list_users',
   label: 'List Users',
   description: 'List Linear users so agents can discover assignee IDs.',
+  promptSnippet: 'List users',
+  promptGuidelines: ['Use linear_list_users when assigneeId is unknown.'],
   parameters: listUsersSchema,
   async execute(_toolCallId, input) {
     const result = await listLinearUsers(input as Record<string, unknown>);

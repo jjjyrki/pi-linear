@@ -61,6 +61,8 @@ export const linearSearchIssuesTool = defineTool({
   name: "linear_search_issues",
   label: "Search Issues",
   description: "Search Linear issues by title, task ID, or other text.",
+  promptSnippet: "Search issues",
+  promptGuidelines: ["Use linear_search_issues for text lookup or duplicate checks."],
   parameters: searchIssuesSchema,
   async execute(_toolCallId, input) {
     const result = await searchIssues(input as Record<string, unknown>);

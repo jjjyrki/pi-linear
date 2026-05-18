@@ -74,6 +74,8 @@ export const linearCreateIssueWithSubissuesTool = defineTool({
   label: "Create Issue With Sub-Issues",
   description:
     "Create one parent Linear issue and multiple sub-issues under it.",
+  promptSnippet: "Create a parent issue with sub-issues",
+  promptGuidelines: ["Use linear_create_issue_with_subissues for a new parent/child hierarchy after resolving teamId."],
   parameters: createIssueWithSubissuesSchema,
   async execute(_toolCallId, input) {
     const result = await createIssueWithSubissues(

@@ -55,6 +55,8 @@ export const linearListIssuesTool = defineTool({
   name: 'linear_list_issues',
   label: 'List Issues',
   description: 'List open, non-archived Linear issues (updated most recently first).',
+  promptSnippet: 'List recent open issues',
+  promptGuidelines: ['Use linear_list_issues to browse open work; search/read for targeted lookup.'],
   parameters: listIssuesSchema,
   async execute(_toolCallId, input) {
     const result = await listIssues(input as Record<string, unknown>);

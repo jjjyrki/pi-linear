@@ -97,6 +97,8 @@ export const linearUpdateIssueTool = defineTool({
   name: 'linear_update_issue',
   label: 'Update Issue',
   description: 'Update mutable fields on a Linear issue by UUID or human identifier, including optional parent reparenting.',
+  promptSnippet: 'Update issue fields',
+  promptGuidelines: ['Use linear_update_issue after confirming the target issue and desired field changes.'],
   parameters: updateIssueSchema,
   async execute(_toolCallId, input) {
     const issue = await updateIssue(input as Record<string, unknown>);

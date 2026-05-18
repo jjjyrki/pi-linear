@@ -71,6 +71,8 @@ export const linearCreateIssuesTool = defineTool({
   label: "Create Issues",
   description:
     "Create multiple Linear issues with one shared team ID and optional metadata.",
+  promptSnippet: "Create several issues",
+  promptGuidelines: ["Use linear_create_issues for independent issues in one team after duplicate checks."],
   parameters: createIssuesSchema,
   async execute(_toolCallId, input) {
     const result = await createIssues(input as Record<string, unknown>);

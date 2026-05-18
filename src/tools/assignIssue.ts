@@ -21,6 +21,8 @@ export const linearAssignIssueTool = defineTool({
   name: 'linear_assign_issue',
   label: 'Assign Issue',
   description: 'Assign or unassign a Linear issue by UUID or human identifier.',
+  promptSnippet: 'Assign or unassign an issue',
+  promptGuidelines: ['Use linear_assign_issue only for assignee changes; list users first if needed.'],
   parameters: assignIssueSchema,
   async execute(_toolCallId, input) {
     const issue = await assignIssue(input as Record<string, unknown>);

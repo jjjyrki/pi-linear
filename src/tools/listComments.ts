@@ -46,6 +46,8 @@ export const linearListCommentsTool = defineTool({
   name: 'linear_list_comments',
   label: 'List Comments',
   description: 'List comments for a Linear issue in chronological order.',
+  promptSnippet: 'List issue comments',
+  promptGuidelines: ['Use linear_list_comments when comment history is needed.'],
   parameters: listCommentsSchema,
   async execute(_toolCallId, input) {
     const result = await listComments(input as Record<string, unknown>);

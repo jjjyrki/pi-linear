@@ -26,6 +26,8 @@ export const linearListTeamsTool = defineTool({
   name: 'linear_list_teams',
   label: 'List Teams',
   description: 'List Linear teams so agents can discover team IDs.',
+  promptSnippet: 'List teams',
+  promptGuidelines: ['Use linear_list_teams when teamId is unknown.'],
   parameters: listTeamsSchema,
   async execute(_toolCallId, input) {
     const result = await listLinearTeams(input as Record<string, unknown>);

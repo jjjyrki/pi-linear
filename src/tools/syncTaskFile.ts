@@ -97,6 +97,8 @@ export const linearSyncTaskFileTool = defineTool({
   name: "linear_sync_task_file",
   label: "Sync Task File",
   description: "Idempotently sync a local markdown task file to Linear issues.",
+  promptSnippet: "Sync task file to issues",
+  promptGuidelines: ["Use linear_sync_task_file for repeatable markdown-task syncing after resolving teamId."],
   parameters: syncTaskFileSchema,
   async execute(_toolCallId, input) {
     const result = await syncTaskFile(input as Record<string, unknown>);
