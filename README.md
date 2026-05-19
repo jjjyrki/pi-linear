@@ -16,7 +16,7 @@ export LINEAR_API_KEY="lin_api_..."
 
 ### API key permissions
 
-Personal API keys act as the creating user. They can read and mutate issues, comments, and discovery data that user can access in Linear. Use a dedicated key for automation, rotate it if exposed, and revoke keys you no longer need. See [SECURITY.md](SECURITY.md) for reporting vulnerabilities and safe secret storage.
+Personal API keys act as the creating user. They can read and mutate issues, comments, and discovery data that user can access in Linear. Use a dedicated key for automation, rotate it if exposed, and revoke keys you no longer need.
 
 ## Discovery before mutation
 
@@ -44,7 +44,7 @@ Run `/linear-tools` in Pi for required inputs per tool.
 | Rate limited | Wait and retry; avoid tight loops of tool calls. |
 | Network errors | Check VPN/firewall access to Linear’s API endpoints. |
 
-Tool and command errors are normalized to actionable messages and redact configured API keys. Future OAuth support is outlined in [docs/architecture/oauth.md](docs/architecture/oauth.md).
+Tool and command errors are normalized to actionable messages and redact configured API keys.
 
 ## Development
 
