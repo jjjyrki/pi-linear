@@ -23,12 +23,14 @@ const updateIssueSchema = Type.Object({
   assigneeId: Type.Optional(Type.Union([Type.String(), Type.Null()])),
   priority: Type.Optional(prioritySchema),
   labelIds: Type.Optional(Type.Array(Type.String())),
+  projectId: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+  cycleId: Type.Optional(Type.Union([Type.String(), Type.Null()])),
   estimate: Type.Optional(Type.Union([Type.Number(), Type.Null()])),
   dueDate: Type.Optional(Type.Union([dueDateSchema, Type.Null()])),
   parentId: Type.Optional(Type.Union([Type.String(), Type.Null()])),
 });
 
-const mutableFields = ['title', 'description', 'stateId', 'assigneeId', 'priority', 'labelIds', 'estimate', 'dueDate', 'parentId'] as const;
+const mutableFields = ['title', 'description', 'stateId', 'assigneeId', 'priority', 'labelIds', 'projectId', 'cycleId', 'estimate', 'dueDate', 'parentId'] as const;
 
 export async function updateIssue(input: Record<string, unknown>) {
   const issueReference = requireNonEmptyString(input.issueId, 'issueId');
@@ -71,6 +73,8 @@ export function buildIssueUpdateInput(
   const stateId = optionalNullableString(input.stateId, 'stateId', { allowNull: false });
   const assigneeId = optionalNullableString(input.assigneeId, 'assigneeId', { allowNull: true });
   const labelIds = optionalStringArray(input.labelIds, 'labelIds');
+  const projectId = optionalNullableString(input.projectId, 'projectId', { allowNull: true });
+  const cycleId = optionalNullableString(input.cycleId, 'cycleId', { allowNull: true });
   const estimate = optionalNullableNumber(input.estimate, 'estimate');
   const dueDate = input.dueDate === null ? null : validateDueDate(input.dueDate);
   const priority = mapPriorityInputToLinear(input.priority);
@@ -81,6 +85,8 @@ export function buildIssueUpdateInput(
     stateId,
     assigneeId,
     labelIds,
+    projectId,
+    cycleId,
     estimate,
     dueDate,
     priority,

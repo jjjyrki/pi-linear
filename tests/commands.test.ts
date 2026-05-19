@@ -63,6 +63,10 @@ describe('linear slash commands', () => {
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_sync_task_file: teamId, taskFilePath, optional mode/createSubtasks/linkDependencies');
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_create_task_subissues_from_markdown: teamId, taskFilePath, branchPrefix');
     expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_list_workflow_states: (none)');
+    expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_list_labels:');
+    expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_list_projects:');
+    expect((sendMessage.mock.calls[1][0] as { content: string }).content).toContain('linear_list_cycles:');
+    expect((sendMessage.mock.calls[0][0] as { content: string }).content).toContain('Discover IDs with list tools');
   });
 
   it('validates /linear-status without leaking secrets', async () => {

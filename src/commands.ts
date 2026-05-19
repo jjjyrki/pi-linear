@@ -27,6 +27,9 @@ const linearToolHelp: LinearToolHelp[] = [
   { name: 'linear_list_teams', requiredInputs: '(none)' },
   { name: 'linear_list_users', requiredInputs: 'query optional; first/after optional' },
   { name: 'linear_list_workflow_states', requiredInputs: '(none)' },
+  { name: 'linear_list_labels', requiredInputs: 'teamId/query optional; first/after optional' },
+  { name: 'linear_list_projects', requiredInputs: 'teamId/query/statusId optional; first/after optional' },
+  { name: 'linear_list_cycles', requiredInputs: 'teamId optional; first/after optional' },
 ];
 
 export function registerLinearCommands(pi: ExtensionAPI): void {
@@ -75,7 +78,8 @@ function buildLinearHelpMessage(): string {
     'Linear extension',
     `Credentials: ${isLinearApiKeyConfigured() ? 'configured' : 'missing'}`,
     '',
-    'Agent tools: issue CRUD, comments, and discovery (viewer, teams, users, workflow states).',
+    'Agent tools: issue CRUD, comments, and discovery (viewer, teams, users, workflow states, labels, projects, cycles).',
+    'Discover IDs with list tools before create/update (labels, projects, cycles, states, users).',
     'Try:',
     '- Create ENG issue titled "Fix flaky checkout test"',
     '- List my open Linear issues for team ENG',

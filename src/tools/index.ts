@@ -9,6 +9,9 @@ import { linearCreateIssueWithSubissuesTool } from './createIssueWithSubissues.j
 import { linearCreateTaskSubissuesFromMarkdownTool } from './createTaskSubissuesFromMarkdown.js';
 import { linearListCommentsTool } from './listComments.js';
 import { linearListIssuesTool } from './listIssues.js';
+import { linearListCyclesTool } from './listCycles.js';
+import { linearListLabelsTool } from './listLabels.js';
+import { linearListProjectsTool } from './listProjects.js';
 import { linearListTeamsTool } from './listTeams.js';
 import { linearListUsersTool } from './listUsers.js';
 import { linearListWorkflowStatesTool } from './listWorkflowStates.js';
@@ -36,6 +39,9 @@ export const linearToolDefinitions = [
   linearListTeamsTool,
   linearListUsersTool,
   linearListWorkflowStatesTool,
+  linearListLabelsTool,
+  linearListProjectsTool,
+  linearListCyclesTool,
 ] as const;
 
 export function registerLinearTools(pi: ExtensionAPI): void {

@@ -1,5 +1,5 @@
 id: TASK-0018
-status: todo
+status: done
 summary: Add Linear label, project, and cycle discovery tools
 
 # Goal
@@ -35,13 +35,13 @@ Agents can list cycles for a team and obtain IDs usable when creating or updatin
 Discovery results must return compact structured objects and pagination metadata.
 
 # Acceptance criteria
-- [ ] Agents can discover label IDs through `linear_list_labels`.
-- [ ] Agents can discover project IDs through `linear_list_projects`.
-- [ ] Agents can discover cycle IDs through `linear_list_cycles`.
-- [ ] Issue create/update supports project and cycle IDs if confirmed against the SDK.
-- [ ] New tools are registered and listed by `/linear-tools`.
-- [ ] README documents discovery-before-mutation usage.
-- [ ] Existing tests and build still pass.
+- [x] Agents can discover label IDs through `linear_list_labels`.
+- [x] Agents can discover project IDs through `linear_list_projects`.
+- [x] Agents can discover cycle IDs through `linear_list_cycles`.
+- [x] Issue create/update supports project and cycle IDs if confirmed against the SDK.
+- [x] New tools are registered and listed by `/linear-tools`.
+- [x] README documents discovery-before-mutation usage.
+- [x] Existing tests and build still pass.
 
 # Testing expectations
 - Unit-test schema validation, pagination bounds, normalization, and SDK call shapes for each discovery tool.

@@ -30,6 +30,29 @@ describe('issue tools', () => {
     expect(issue).toMatchObject({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' });
   });
 
+  it('creates an issue with project and cycle IDs', async () => {
+    const createIssueFn = jest.fn().mockResolvedValue({
+      success: true,
+      issue: Promise.resolve({ id: 'i1', identifier: 'ENG-1', title: 'Bug fix' }),
+    } as never);
+
+    getLinearClientMock.mockReturnValue({ createIssue: createIssueFn } as never);
+
+    await createIssue({
+      teamId: 't1',
+      title: 'Bug fix',
+      projectId: 'p1',
+      cycleId: 'c1',
+    });
+
+    expect(createIssueFn).toHaveBeenCalledWith(expect.objectContaining({
+      teamId: 't1',
+      title: 'Bug fix',
+      projectId: 'p1',
+      cycleId: 'c1',
+    }));
+  });
+
   it('creates a sub-issue when a parent issue is supplied', async () => {
     const issueFn = jest
       .fn()
@@ -140,6 +163,22 @@ describe('issue tools', () => {
     });
 
     expect(() => buildIssueUpdateInput({ issueId: 'ENG-1' })).toThrow(LinearValidationError);
+  });
+
+  it('updates project and cycle IDs, including clearing them', async () => {
+    const issueFn = jest.fn().mockResolvedValue({ id: 'i1', identifier: 'ENG-1', title: 'A' } as never);
+    const updateIssueFn = jest.fn().mockResolvedValue({
+      success: true,
+      issue: Promise.resolve({ id: 'i1', identifier: 'ENG-1', title: 'A' }),
+    } as never);
+
+    getLinearClientMock.mockReturnValue({ issue: issueFn, updateIssue: updateIssueFn } as never);
+
+    await updateIssue({ issueId: 'ENG-1', projectId: 'p1', cycleId: 'c1' });
+    await updateIssue({ issueId: 'ENG-1', projectId: null, cycleId: null });
+
+    expect(updateIssueFn).toHaveBeenNthCalledWith(1, 'i1', expect.objectContaining({ projectId: 'p1', cycleId: 'c1' }));
+    expect(updateIssueFn).toHaveBeenNthCalledWith(2, 'i1', expect.objectContaining({ projectId: null, cycleId: null }));
   });
 
   it('reparents and clears parent issues through update path', async () => {

@@ -1,4 +1,12 @@
-import type { NormalizedComment, NormalizedIssueSummary, NormalizedUser, NormalizedWorkflowState } from '../linear/shared.js';
+import type {
+  NormalizedComment,
+  NormalizedCycle,
+  NormalizedIssueSummary,
+  NormalizedLabel,
+  NormalizedProject,
+  NormalizedUser,
+  NormalizedWorkflowState,
+} from '../linear/shared.js';
 
 export function formatIssueSummary(issue: NormalizedIssueSummary): string {
   const suffix = [issue.url, issue.parent?.identifier ? `parent: ${issue.parent.identifier}` : undefined, `id: ${issue.id}`]
@@ -15,6 +23,40 @@ export function formatUserLine(user: NormalizedUser): string {
   const label = user.displayName ?? user.name ?? 'Unnamed user';
   const details = [user.email, `id: ${user.id}`].filter(Boolean).join(' | ');
   return `- ${label} (${details})`;
+}
+
+export function formatLabelLine(label: NormalizedLabel): string {
+  const team = label.team?.key ?? label.team?.name;
+  const metadata = [
+    label.color,
+    label.isGroup ? 'group' : undefined,
+    team ? `team: ${team}` : undefined,
+    `id: ${label.id}`,
+  ].filter(Boolean).join(' | ');
+  return `- ${label.name} (${metadata})`;
+}
+
+export function formatProjectLine(project: NormalizedProject): string {
+  const status = project.status?.name ?? project.status?.type ?? project.state;
+  const metadata = [
+    status ? `status: ${status}` : undefined,
+    project.slugId ? `slug: ${project.slugId}` : undefined,
+    `id: ${project.id}`,
+  ].filter(Boolean).join(' | ');
+  return `- ${project.name} (${metadata})`;
+}
+
+export function formatCycleLine(cycle: NormalizedCycle): string {
+  const title = cycle.name ?? `Cycle ${cycle.number}`;
+  const team = cycle.team?.key ?? cycle.team?.name;
+  const phase = cycle.isActive ? 'active' : cycle.isNext ? 'next' : cycle.isFuture ? 'future' : cycle.isPast ? 'past' : undefined;
+  const metadata = [
+    `number: ${cycle.number}`,
+    phase,
+    team ? `team: ${team}` : undefined,
+    `id: ${cycle.id}`,
+  ].filter(Boolean).join(' | ');
+  return `- ${title} (${metadata})`;
 }
 
 export function formatWorkflowStateLine(state: NormalizedWorkflowState): string {
