@@ -17,6 +17,8 @@ const createIssueSchema = Type.Object({
   stateId: Type.Optional(Type.String()),
   priority: Type.Optional(prioritySchema),
   labelIds: Type.Optional(Type.Array(Type.String())),
+  projectId: Type.Optional(Type.String()),
+  cycleId: Type.Optional(Type.String()),
   estimate: Type.Optional(Type.Number()),
   dueDate: Type.Optional(dueDateSchema),
   parentId: Type.Optional(Type.String()),
@@ -30,6 +32,8 @@ export type ValidatedIssueCreateInput = {
   stateId?: string;
   priority?: number;
   labelIds?: string[];
+  projectId?: string;
+  cycleId?: string;
   estimate?: number;
   dueDate?: string;
   parentReference?: string;
@@ -43,6 +47,8 @@ export type IssueCreatePayload = {
   stateId?: string;
   priority?: number;
   labelIds?: string[];
+  projectId?: string;
+  cycleId?: string;
   estimate?: number;
   dueDate?: string;
   parentId?: string;
@@ -65,6 +71,8 @@ export function validateIssueCreateInput(
   const assigneeId = optionalString(input.assigneeId, 'assigneeId');
   const stateId = optionalString(input.stateId, 'stateId');
   const labelIds = optionalStringArray(input.labelIds, 'labelIds');
+  const projectId = optionalString(input.projectId, 'projectId');
+  const cycleId = optionalString(input.cycleId, 'cycleId');
   const estimate = optionalNumber(input.estimate, 'estimate');
   const dueDate = validateDueDate(input.dueDate);
   const priority = mapPriorityInputToLinear(input.priority);
@@ -78,6 +86,8 @@ export function validateIssueCreateInput(
     stateId,
     priority,
     labelIds,
+    projectId,
+    cycleId,
     estimate,
     dueDate,
     parentReference,
@@ -98,6 +108,8 @@ export async function buildIssueCreatePayload(
     stateId: input.stateId,
     priority: input.priority,
     labelIds: input.labelIds,
+    projectId: input.projectId,
+    cycleId: input.cycleId,
     estimate: input.estimate,
     dueDate: input.dueDate,
     ...(parentId === undefined ? {} : { parentId }),

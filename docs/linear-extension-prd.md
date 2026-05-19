@@ -271,6 +271,66 @@ Implementation:
 - Set `truncated: true` when more workflow states may be available beyond the cap.
 - Do not add team-scoped state filtering in the MVP because the expected workspace uses one team.
 
+### `linear_list_labels`
+List issue labels so agents can discover label IDs.
+
+Optional parameters:
+- `teamId`: Scope labels to a team.
+- `query`: Case-insensitive name search.
+- `first`
+- `after`
+
+Returns:
+- `labels`: `id`, `name`, `color`, `description`, `isGroup`, and team summary where available.
+- `pageInfo`: `hasNextPage`, `endCursor`, `hasPreviousPage`, `startCursor`.
+
+Implementation:
+- Use `first` default `25`, maximum `100`, and reject requests above the maximum with a clear validation error.
+- Call the SDK `issueLabels` query with optional team and name filters.
+
+### `linear_list_projects`
+List projects so agents can discover project IDs.
+
+Optional parameters:
+- `teamId`: Limit to projects accessible to a team.
+- `query`: Case-insensitive name search.
+- `statusId`: Filter by project status ID.
+- `first`
+- `after`
+
+Returns:
+- `projects`: `id`, `name`, `slugId`, `url`, `description`, `color`, deprecated `state`, and `status` summary where available.
+- `pageInfo`: `hasNextPage`, `endCursor`, `hasPreviousPage`, `startCursor`.
+
+Implementation:
+- Use `first` default `25`, maximum `100`, and reject requests above the maximum with a clear validation error.
+- Exclude trashed projects by default.
+
+### `linear_list_cycles`
+List cycles so agents can discover cycle IDs.
+
+Optional parameters:
+- `teamId`: Scope cycles to a team.
+- `first`
+- `after`
+
+Returns:
+- `cycles`: `id`, `number`, `name`, `description`, `startsAt`, `endsAt`, phase flags, and team summary where available.
+- `pageInfo`: `hasNextPage`, `endCursor`, `hasPreviousPage`, `startCursor`.
+
+Implementation:
+- Use `first` default `25`, maximum `100`, and reject requests above the maximum with a clear validation error.
+- Order cycles by `createdAt`.
+
+### Discovery before mutation
+Agents should list or search for IDs before setting relationship fields on create or update:
+- `labelIds` via `linear_list_labels`
+- `projectId` via `linear_list_projects`
+- `cycleId` via `linear_list_cycles`
+- `stateId` via `linear_list_workflow_states`
+- `assigneeId` via `linear_list_users`
+- `teamId` via `linear_list_teams`
+
 ## Proposed Pi Slash Commands
 
 Slash commands are for the human using Pi. They should be lightweight wrappers around package status and documentation, not the primary issue API.
@@ -319,6 +379,9 @@ Expected output:
 - `linear_list_teams`: optional pagination.
 - `linear_list_users`: optional `query` and pagination.
 - `linear_list_workflow_states`: no inputs.
+- `linear_list_labels`: optional `teamId`, `query`, and pagination.
+- `linear_list_projects`: optional `teamId`, `query`, `statusId`, and pagination.
+- `linear_list_cycles`: optional `teamId` and pagination.
 
 Example:
 

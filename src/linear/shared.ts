@@ -52,6 +52,47 @@ export type NormalizedWorkflowState = {
   team?: NormalizedTeam;
 };
 
+export type NormalizedLabel = {
+  id: string;
+  name: string;
+  color?: string;
+  description?: string;
+  isGroup?: boolean;
+  team?: NormalizedTeam;
+};
+
+export type NormalizedProjectStatus = {
+  id: string;
+  name?: string;
+  type?: string;
+};
+
+export type NormalizedProject = {
+  id: string;
+  name: string;
+  slugId?: string;
+  url?: string;
+  description?: string;
+  color?: string;
+  state?: string;
+  status?: NormalizedProjectStatus;
+};
+
+export type NormalizedCycle = {
+  id: string;
+  number: number;
+  name?: string;
+  description?: string;
+  startsAt?: string;
+  endsAt?: string;
+  isActive?: boolean;
+  isFuture?: boolean;
+  isPast?: boolean;
+  isNext?: boolean;
+  isPrevious?: boolean;
+  team?: NormalizedTeam;
+};
+
 export type NormalizedIssueParent = {
   id: string;
   identifier?: string;
@@ -417,6 +458,30 @@ export function normalizeDiscoveryWorkflowState(value: unknown): NormalizedWorkf
   return workflowState;
 }
 
+export function normalizeDiscoveryLabel(value: unknown): NormalizedLabel {
+  const label = normalizeLabelSummary(value);
+  if (!label) {
+    throw new LinearValidationError('label data is missing required fields.');
+  }
+  return label;
+}
+
+export function normalizeDiscoveryProject(value: unknown): NormalizedProject {
+  const project = normalizeProjectSummary(value);
+  if (!project) {
+    throw new LinearValidationError('project data is missing required fields.');
+  }
+  return project;
+}
+
+export function normalizeDiscoveryCycle(value: unknown): NormalizedCycle {
+  const cycle = normalizeCycleSummary(value);
+  if (!cycle) {
+    throw new LinearValidationError('cycle data is missing required fields.');
+  }
+  return cycle;
+}
+
 export function normalizePageInfo(value: unknown): NormalizedPageInfo {
   if (!value || typeof value !== 'object') {
     throw new LinearValidationError('pageInfo data is missing or invalid.');
@@ -513,6 +578,120 @@ function normalizeIssueParent(value: unknown): NormalizedIssueParent | undefined
   if (identifier) parent.identifier = identifier;
   if (title) parent.title = title;
   return parent;
+}
+
+function normalizeLabelSummary(value: unknown): NormalizedLabel | undefined {
+  if (!value || typeof value !== 'object') {
+    return undefined;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  const id = getString(candidate.id);
+  const name = getString(candidate.name);
+  if (!id || !name) {
+    return undefined;
+  }
+
+  const label: NormalizedLabel = { id, name };
+  const color = getString(candidate.color);
+  const description = getString(candidate.description);
+  const team = normalizeTeamSummary(candidate.team ?? candidate.teamId);
+
+  if (color) label.color = color;
+  if (description) label.description = description;
+  if (typeof candidate.isGroup === 'boolean') label.isGroup = candidate.isGroup;
+  if (team) label.team = team;
+
+  return label;
+}
+
+function normalizeProjectStatusSummary(value: unknown): NormalizedProjectStatus | undefined {
+  if (typeof value === 'string') {
+    return { id: value };
+  }
+  if (!value || typeof value !== 'object') {
+    return undefined;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  const id = getString(candidate.id);
+  if (!id) {
+    return undefined;
+  }
+
+  const status: NormalizedProjectStatus = { id };
+  const name = getString(candidate.name);
+  const type = getString(candidate.type);
+  if (name) status.name = name;
+  if (type) status.type = type;
+  return status;
+}
+
+function normalizeProjectSummary(value: unknown): NormalizedProject | undefined {
+  if (!value || typeof value !== 'object') {
+    return undefined;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  const id = getString(candidate.id);
+  const name = getString(candidate.name);
+  if (!id || !name) {
+    return undefined;
+  }
+
+  const project: NormalizedProject = { id, name };
+  const slugId = getString(candidate.slugId);
+  const url = getString(candidate.url);
+  const description = getString(candidate.description);
+  const color = getString(candidate.color);
+  const state = getString(candidate.state);
+  const status = normalizeProjectStatusSummary(candidate.status);
+
+  if (slugId) project.slugId = slugId;
+  if (url) project.url = url;
+  if (description) project.description = description;
+  if (color) project.color = color;
+  if (state) project.state = state;
+  if (status) project.status = status;
+
+  return project;
+}
+
+function normalizeCycleSummary(value: unknown): NormalizedCycle | undefined {
+  if (!value || typeof value !== 'object') {
+    return undefined;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  const id = getString(candidate.id);
+  if (!id) {
+    return undefined;
+  }
+
+  const number = typeof candidate.number === 'number' ? candidate.number : undefined;
+  if (number === undefined) {
+    return undefined;
+  }
+
+  const cycle: NormalizedCycle = { id, number };
+  const name = getString(candidate.name);
+  const description = getString(candidate.description);
+  const startsAt = normalizeIsoDateTime(candidate.startsAt);
+  const endsAt = normalizeIsoDateTime(candidate.endsAt);
+  const team = normalizeTeamSummary(candidate.team ?? candidate.teamId);
+
+  if (name) cycle.name = name;
+  if (description) cycle.description = description;
+  if (startsAt) cycle.startsAt = startsAt;
+  if (endsAt) cycle.endsAt = endsAt;
+  if (typeof candidate.isActive === 'boolean') cycle.isActive = candidate.isActive;
+  if (typeof candidate.isFuture === 'boolean') cycle.isFuture = candidate.isFuture;
+  if (typeof candidate.isPast === 'boolean') cycle.isPast = candidate.isPast;
+  if (typeof candidate.isNext === 'boolean') cycle.isNext = candidate.isNext;
+  if (typeof candidate.isPrevious === 'boolean') cycle.isPrevious = candidate.isPrevious;
+  if (team) cycle.team = team;
+
+  return cycle;
 }
 
 function normalizeLabels(value: unknown): { id: string; name: string; color?: string }[] | undefined {

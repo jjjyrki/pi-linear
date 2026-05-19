@@ -24,6 +24,8 @@ const bulkIssueSchema = Type.Object({
   parentId: Type.Optional(Type.String()),
   priority: Type.Optional(prioritySchema),
   labelIds: Type.Optional(Type.Array(Type.String())),
+  projectId: Type.Optional(Type.String()),
+  cycleId: Type.Optional(Type.String()),
   stateId: Type.Optional(Type.String()),
   assigneeId: Type.Optional(Type.String()),
   estimate: Type.Optional(Type.Number()),
