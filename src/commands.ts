@@ -1,6 +1,13 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 
 import { getLinearClient } from './client.js';
+import {
+  classifyLinearStatusFailure,
+  describeLinearStatusFailure,
+  formatSafeErrorMessage,
+  getLinearApiKeyState,
+  withLinearOperation,
+} from './linear/errorHandling.js';
 
 export const linearCommandNames = ['linear', 'linear-status', 'linear-tools'] as const;
 
@@ -47,16 +54,25 @@ export function registerLinearCommands(pi: ExtensionAPI): void {
   pi.registerCommand('linear-status', {
     description: 'Check whether Linear is configured and reachable.',
     handler: async (_args, ctx) => {
-      if (!isLinearApiKeyConfigured()) {
+      const apiKeyState = getLinearApiKeyState();
+      if (apiKeyState === 'missing') {
         ctx.ui.notify('LINEAR_API_KEY is not set. Set it and reload Pi.', 'warning');
+        return;
+      }
+      if (apiKeyState === 'blank') {
+        ctx.ui.notify('LINEAR_API_KEY is set but empty. Set a valid API key and reload Pi.', 'warning');
         return;
       }
 
       try {
-        await getLinearClient().viewer;
+        await withLinearOperation('linear-status', async () => getLinearClient().viewer);
         ctx.ui.notify('LINEAR_API_KEY is set and Linear authentication looks good.', 'info');
       } catch (error) {
-        ctx.ui.notify(`LINEAR_API_KEY is set, but Linear authentication check failed: ${getErrorMessage(error)}`, 'error');
+        const category = classifyLinearStatusFailure(error);
+        ctx.ui.notify(
+          `LINEAR_API_KEY is set, but ${describeLinearStatusFailure(category)} (${formatSafeErrorMessage(error, { operation: 'linear-status' })})`,
+          'error',
+        );
       }
     },
   });
@@ -76,7 +92,7 @@ export function registerLinearCommands(pi: ExtensionAPI): void {
 function buildLinearHelpMessage(): string {
   return [
     'Linear extension',
-    `Credentials: ${isLinearApiKeyConfigured() ? 'configured' : 'missing'}`,
+    `Credentials: ${describeCredentialState(getLinearApiKeyState())}`,
     '',
     'Agent tools: issue CRUD, comments, and discovery (viewer, teams, users, workflow states, labels, projects, cycles).',
     'Discover IDs with list tools before create/update (labels, projects, cycles, states, users).',
@@ -96,13 +112,13 @@ function buildLinearToolsMessage(): string {
   ].join('\n');
 }
 
-function isLinearApiKeyConfigured(): boolean {
-  return Boolean(process.env.LINEAR_API_KEY?.trim());
-}
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error && error.message.trim().length > 0) {
-    return error.message;
+function describeCredentialState(state: ReturnType<typeof getLinearApiKeyState>): string {
+  switch (state) {
+    case 'configured':
+      return 'configured';
+    case 'blank':
+      return 'blank';
+    default:
+      return 'missing';
   }
-  return 'unknown error';
 }

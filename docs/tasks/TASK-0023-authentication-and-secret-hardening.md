@@ -1,5 +1,5 @@
 id: TASK-0023
-status: todo
+status: done
 summary: Harden Linear authentication, errors, and secret handling for public use
 
 # Goal
@@ -32,11 +32,11 @@ Errors must be actionable but must not include API keys or raw secret-bearing pa
 Users must know how to report vulnerabilities and how to configure secrets safely.
 
 # Acceptance criteria
-- [ ] Common SDK/network errors are normalized with operation context.
-- [ ] Tests assert token values are not leaked in errors or command output.
-- [ ] `/linear-status` gives actionable non-secret diagnostics.
-- [ ] README/security docs cover secret configuration and reporting.
-- [ ] Existing tests and build still pass.
+- [x] Common SDK/network errors are normalized with operation context.
+- [x] Tests assert token values are not leaked in errors or command output.
+- [x] `/linear-status` gives actionable non-secret diagnostics.
+- [x] README/security docs cover secret configuration and reporting.
+- [x] Existing tests and build still pass.
 
 # Testing expectations
 - Unit-test missing, blank, invalid, permission, rate-limit, and network-style error paths with mocked SDK errors.

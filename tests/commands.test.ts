@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { AuthenticationLinearError } from '@linear/sdk';
 
 const getLinearClientMock = jest.fn();
 
@@ -76,10 +77,33 @@ describe('linear slash commands', () => {
     await handlers['linear-status']('', { ui: { notify } } as never);
     expect(notify).toHaveBeenCalledWith('LINEAR_API_KEY is not set. Set it and reload Pi.', 'warning');
 
-    process.env.LINEAR_API_KEY = 'test-token';
+    process.env.LINEAR_API_KEY = '   ';
+    await handlers['linear-status']('', { ui: { notify } } as never);
+    expect(notify).toHaveBeenLastCalledWith(
+      'LINEAR_API_KEY is set but empty. Set a valid API key and reload Pi.',
+      'warning',
+    );
+
+    const secret = 'lin_api_test_status_secret';
+    process.env.LINEAR_API_KEY = secret;
     getLinearClientMock.mockReturnValue({ viewer: Promise.resolve({ id: 'u1', name: 'Ada' }) } as never);
 
     await handlers['linear-status']('', { ui: { notify } } as never);
     expect(notify).toHaveBeenLastCalledWith('LINEAR_API_KEY is set and Linear authentication looks good.', 'info');
+    expect(JSON.stringify(notify.mock.calls)).not.toContain(secret);
+
+    getLinearClientMock.mockReturnValue({
+      get viewer() {
+        return Promise.reject(
+          new AuthenticationLinearError({ message: `Invalid API key ${secret}` } as never),
+        );
+      },
+    } as never);
+
+    await handlers['linear-status']('', { ui: { notify } } as never);
+    const failureMessage = (notify.mock.calls.at(-1)?.[0] as string) ?? '';
+    expect(failureMessage).toContain('rejected the API key');
+    expect(failureMessage).not.toContain(secret);
+    expect(failureMessage).not.toContain('lin_api_');
   });
 });
