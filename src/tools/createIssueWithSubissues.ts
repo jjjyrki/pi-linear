@@ -3,6 +3,7 @@ import { Type } from "@mariozechner/pi-ai";
 
 import { getLinearClient } from "../client.js";
 import { LinearValidationError } from "../errors.js";
+import { formatSafeErrorMessage } from "../linear/errorHandling.js";
 import { optionalTextSchema } from "../schemas.js";
 import { type NormalizedIssueSummary } from "../linear/shared.js";
 import {
@@ -152,13 +153,6 @@ function createSubissueError(
       ? ` Created sub-issues before failure: ${createdSubissues.map((issue) => issue.identifier).join(", ")}.`
       : "";
   return new Error(
-    `Failed to create sub-issue ${index + 1} (${failedInput.title}) under ${parent.identifier}: ${getErrorMessage(error)}.${createdContext}`,
+    `Failed to create sub-issue ${index + 1} (${failedInput.title}) under ${parent.identifier}: ${formatSafeErrorMessage(error, { operation: "linear_create_issue_with_subissues" })}.${createdContext}`,
   );
-}
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error && error.message.trim().length > 0) {
-    return error.message;
-  }
-  return "unknown error";
 }

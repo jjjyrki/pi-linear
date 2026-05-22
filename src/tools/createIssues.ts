@@ -3,6 +3,7 @@ import { Type } from "@mariozechner/pi-ai";
 
 import { getLinearClient } from "../client.js";
 import { LinearValidationError } from "../errors.js";
+import { formatSafeErrorMessage } from "../linear/errorHandling.js";
 import {
   dueDateSchema,
   optionalTextSchema,
@@ -123,13 +124,6 @@ function createBulkCreateError(
       ? ` Created before failure: ${created.map((issue) => issue.identifier).join(", ")}.`
       : "";
   return new Error(
-    `Failed to create issue ${index + 1} (${failedInput.title}): ${getErrorMessage(error)}.${createdContext}`,
+    `Failed to create issue ${index + 1} (${failedInput.title}): ${formatSafeErrorMessage(error, { operation: "linear_create_issues" })}.${createdContext}`,
   );
-}
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error && error.message.trim().length > 0) {
-    return error.message;
-  }
-  return "unknown error";
 }

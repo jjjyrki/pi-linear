@@ -4,7 +4,19 @@ Pi extension for working with Linear.
 
 ## Setup
 
-Set `LINEAR_API_KEY` and load the extension in Pi (see `docs/linear-extension-prd.md` for install and slash commands).
+1. Create a [Linear personal API key](https://linear.app/settings/api) for the workspace you want to use.
+2. Export it in the same shell that starts Pi:
+
+```bash
+export LINEAR_API_KEY="lin_api_..."
+```
+
+3. Load the extension in Pi (see `docs/linear-extension-prd.md` for install and slash commands).
+4. Run `/linear-status` to verify configuration. The command never prints the key value.
+
+### API key permissions
+
+Personal API keys act as the creating user. They can read and mutate issues, comments, and discovery data that user can access in Linear. Use a dedicated key for automation, rotate it if exposed, and revoke keys you no longer need.
 
 ## Discovery before mutation
 
@@ -20,6 +32,19 @@ Issue create and update tools accept relationship IDs (`labelIds`, `projectId`, 
 | `assigneeId` | `linear_list_users` |
 
 Run `/linear-tools` in Pi for required inputs per tool.
+
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| `/linear-status` warns key is not set | Export `LINEAR_API_KEY` in the shell that launches Pi, then reload. |
+| `/linear-status` warns key is empty | Remove whitespace-only values; set a valid `lin_api_...` key. |
+| Authentication rejected | Regenerate the personal API key in Linear settings and update the env var. |
+| Permission denied | Confirm the key’s user has access to the team/issue/workspace. |
+| Rate limited | Wait and retry; avoid tight loops of tool calls. |
+| Network errors | Check VPN/firewall access to Linear’s API endpoints. |
+
+Tool and command errors are normalized to actionable messages and redact configured API keys.
 
 ## Development
 

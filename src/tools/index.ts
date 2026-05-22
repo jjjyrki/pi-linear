@@ -1,5 +1,7 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 
+import { withLinearOperation } from '../linear/errorHandling.js';
+
 import { linearAssignIssueTool } from './assignIssue.js';
 import { linearCreateCommentTool } from './createComment.js';
 import { linearCreateIssueTool } from './createIssue.js';
@@ -46,6 +48,11 @@ export const linearToolDefinitions = [
 
 export function registerLinearTools(pi: ExtensionAPI): void {
   for (const tool of linearToolDefinitions) {
-    pi.registerTool(tool);
+    pi.registerTool({
+      ...tool,
+      async execute(toolCallId, params, signal, onUpdate, ctx) {
+        return withLinearOperation(tool.name, () => tool.execute(toolCallId, params, signal, onUpdate, ctx));
+      },
+    });
   }
 }

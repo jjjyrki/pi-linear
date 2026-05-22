@@ -26,6 +26,34 @@ export class LinearNotFoundError extends Error {
   }
 }
 
+export class LinearAuthenticationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LinearAuthenticationError';
+  }
+}
+
+export class LinearPermissionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LinearPermissionError';
+  }
+}
+
+export class LinearRateLimitError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LinearRateLimitError';
+  }
+}
+
+export class LinearNetworkError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LinearNetworkError';
+  }
+}
+
 export function createNotImplementedError(feature: string): NotImplementedError {
   return new NotImplementedError(feature);
 }
