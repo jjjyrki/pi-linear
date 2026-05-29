@@ -85,8 +85,8 @@ async function normalizeListedRelation(
   const candidate = asRecord(relation, 'issue relation data is missing or invalid.');
   const id = getString(candidate.id);
   const rawType = getString(candidate.type);
-  const sourceIssueId = getNestedId(candidate.issue);
-  const targetIssueId = getNestedId(candidate.relatedIssue);
+  const sourceIssueId = getString(candidate.issueId) ?? getNestedId(candidate.issue);
+  const targetIssueId = getString(candidate.relatedIssueId) ?? getNestedId(candidate.relatedIssue);
 
   if (!id || !rawType || !sourceIssueId || !targetIssueId) {
     throw new LinearValidationError('issue relation data is missing required fields.');
