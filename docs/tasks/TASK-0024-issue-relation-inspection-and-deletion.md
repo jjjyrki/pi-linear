@@ -1,5 +1,5 @@
 id: TASK-0024
-status: in_progress
+status: done
 summary: Add Linear issue relation listing and safe deletion by relation ID
 
 # Goal
@@ -49,12 +49,12 @@ linear_delete_issue_relation({
 - Return a confirmation payload with the deleted relation ID.
 
 # Acceptance criteria
-- [ ] Agents can list existing relations for an issue.
-- [ ] List output makes relation direction clear from the requested issue's perspective.
-- [ ] Agents can delete an existing relation by relation ID.
-- [ ] Validation rejects blank `issueId` and `relationId` inputs.
-- [ ] `/linear-tools` includes both new tools.
-- [ ] Tests cover list normalization, delete success, and failure paths.
+- [x] Agents can list existing relations for an issue.
+- [x] List output makes relation direction clear from the requested issue's perspective.
+- [x] Agents can delete an existing relation by relation ID.
+- [x] Validation rejects blank `issueId` and `relationId` inputs.
+- [x] `/linear-tools` includes both new tools.
+- [x] Tests cover list normalization, delete success, and failure paths.
 
 # Testing expectations
 - Unit-test relation normalization for outgoing and incoming blocking/related relations.

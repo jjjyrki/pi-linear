@@ -8,6 +8,8 @@ import type {
   NormalizedWorkflowState,
 } from '../linear/shared.js';
 
+import type { ListedIssueRelation } from './listIssueRelations.js';
+
 export function formatIssueSummary(issue: NormalizedIssueSummary): string {
   const suffix = [issue.url, issue.parent?.identifier ? `parent: ${issue.parent.identifier}` : undefined, `id: ${issue.id}`]
     .filter(Boolean)
@@ -74,4 +76,16 @@ export function formatCommentLine(comment: NormalizedComment): string {
     `id: ${comment.id}`,
   ].filter(Boolean).join(' | ');
   return `- ${comment.body}${metadata ? ` (${metadata})` : ''}`;
+}
+
+export function formatIssueRelationLine(relation: ListedIssueRelation): string {
+  const description = relation.type === 'blocks'
+    ? `blocks ${relation.counterpartIssue.identifier}`
+    : relation.type === 'blocked_by'
+      ? `is blocked by ${relation.counterpartIssue.identifier}`
+      : `is related to ${relation.counterpartIssue.identifier}`;
+  const metadata = [relation.counterpartIssue.title, relation.updatedAt ?? relation.createdAt, `id: ${relation.id}`]
+    .filter(Boolean)
+    .join(' | ');
+  return `- ${description}${metadata ? ` (${metadata})` : ''}`;
 }
