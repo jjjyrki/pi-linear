@@ -31,5 +31,6 @@ Open-source and agentic workflow readiness:
 22. `TASK-0022-linear-context-pack-tool.md`
 23. `TASK-0023-authentication-and-secret-hardening.md`
 24. `TASK-0024-issue-relation-inspection-and-deletion.md`
+25. `TASK-0025-selective-batch-operations.md`
 
 Each task is intended to be reviewable on its own while building toward the MVP and follow-on Linear extension workflows.
