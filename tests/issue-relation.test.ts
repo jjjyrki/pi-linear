@@ -33,8 +33,9 @@ describe('issue relation tool', () => {
       success: true,
       issueRelation: Promise.resolve({ id: 'r1', type: 'blocks' }),
     } as never);
+    const issueRelationFn = jest.fn().mockResolvedValue({ id: 'r1' } as never);
 
-    getLinearClientMock.mockReturnValue({ issue: issueFn, createIssueRelation: createIssueRelationFn } as never);
+    getLinearClientMock.mockReturnValue({ issue: issueFn, issueRelation: issueRelationFn, createIssueRelation: createIssueRelationFn } as never);
 
     const result = await createIssueRelation({ issueId: 'ENG-1', relatedIssueId: 'ENG-2', type: 'blocks' });
 
@@ -57,8 +58,9 @@ describe('issue relation tool', () => {
       success: true,
       issueRelationId: 'r1',
     } as never);
+    const issueRelationFn = jest.fn().mockResolvedValue({ id: 'r1' } as never);
 
-    getLinearClientMock.mockReturnValue({ issue: issueFn, createIssueRelation: createIssueRelationFn } as never);
+    getLinearClientMock.mockReturnValue({ issue: issueFn, issueRelation: issueRelationFn, createIssueRelation: createIssueRelationFn } as never);
 
     await createIssueRelation({ issueId: 'ENG-1', relatedIssueId: 'ENG-2', type: 'blocked_by' });
     issueFn.mockClear();
@@ -68,6 +70,8 @@ describe('issue relation tool', () => {
 
     expect(createIssueRelationFn).toHaveBeenNthCalledWith(1, { issueId: 'i2', relatedIssueId: 'i1', type: 'blocks' });
     expect(createIssueRelationFn).toHaveBeenNthCalledWith(2, { issueId: 'i1', relatedIssueId: 'i2', type: 'related' });
+    expect(issueRelationFn).toHaveBeenNthCalledWith(1, 'r1');
+    expect(issueRelationFn).toHaveBeenNthCalledWith(2, 'r1');
   });
 
   it('surfaces Linear API failures with issue context', async () => {
@@ -81,6 +85,36 @@ describe('issue relation tool', () => {
     await expect(createIssueRelation({ issueId: 'ENG-1', relatedIssueId: 'ENG-2', type: 'related' })).rejects.toThrow(/ENG-1 and ENG-2/i);
   });
 
+  it('falls back to the persisted canonical relation id when the returned id is not fetchable', async () => {
+    const issueOneModel = {
+      relations: jest.fn().mockResolvedValue({
+        nodes: [{ id: 'r-canonical', type: 'blocks', issueId: 'i1', relatedIssueId: 'i2' }],
+      } as never),
+    };
+    const issueFn = jest.fn(async (reference: string) => {
+      if (reference === 'ENG-1' || reference === 'i1') {
+        return { id: 'i1', identifier: 'ENG-1', title: 'Issue one', relations: issueOneModel.relations } as never;
+      }
+      if (reference === 'ENG-2' || reference === 'i2') {
+        return { id: 'i2', identifier: 'ENG-2', title: 'Issue two' } as never;
+      }
+      return undefined as never;
+    });
+    const createIssueRelationFn = jest.fn().mockResolvedValue({
+      success: true,
+      issueRelationId: 'r-transient',
+    } as never);
+    const issueRelationFn = jest.fn().mockRejectedValue(new Error('Entity not found') as never);
+
+    getLinearClientMock.mockReturnValue({ issue: issueFn, issueRelation: issueRelationFn, createIssueRelation: createIssueRelationFn } as never);
+
+    const result = await createIssueRelation({ issueId: 'ENG-1', relatedIssueId: 'ENG-2', type: 'blocks' });
+
+    expect(issueRelationFn).toHaveBeenCalledWith('r-transient');
+    expect(issueOneModel.relations).toHaveBeenCalled();
+    expect(result.relation).toEqual({ id: 'r-canonical', type: 'blocks' });
+  });
+
   it('visible output includes relation type and IDs', async () => {
     const issueFn = jest.fn()
       .mockResolvedValueOnce({ id: 'i1', identifier: 'ENG-1', title: 'Issue one' } as never)
@@ -89,8 +123,9 @@ describe('issue relation tool', () => {
       success: true,
       issueRelation: Promise.resolve({ id: 'r1', type: 'blocks' }),
     } as never);
+    const issueRelationFn = jest.fn().mockResolvedValue({ id: 'r1' } as never);
 
-    getLinearClientMock.mockReturnValue({ issue: issueFn, createIssueRelation: createIssueRelationFn } as never);
+    getLinearClientMock.mockReturnValue({ issue: issueFn, issueRelation: issueRelationFn, createIssueRelation: createIssueRelationFn } as never);
 
     const response = await linearCreateIssueRelationTool.execute('tool-call-id', {
       issueId: 'ENG-1',

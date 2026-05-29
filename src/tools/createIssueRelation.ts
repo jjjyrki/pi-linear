@@ -47,9 +47,11 @@ export async function createIssueRelation(input: Record<string, unknown>): Promi
   }
 
   const relationModel = response.issueRelation ? await response.issueRelation : undefined;
-  const relationId = getRelationId(relationModel, response.issueRelationId);
+  const modelRelationId = getRelationModelId(relationModel);
+  const relationId = modelRelationId
+    ?? await resolveCreatedRelationId(client, issue.id, relatedIssue.id, type, getPayloadRelationId(response.issueRelationId));
   if (!relationId) {
-    throw new Error(`Linear createIssueRelation did not return a relation for ${issue.identifier} and ${relatedIssue.identifier}.`);
+    throw new Error(`Linear createIssueRelation returned an unresolvable relation for ${issue.identifier} and ${relatedIssue.identifier}.`);
   }
 
   return {
@@ -111,12 +113,55 @@ function validateRelationType(value: unknown): PublicIssueRelationType {
   return value as PublicIssueRelationType;
 }
 
-function getRelationId(relationModel: unknown, payloadRelationId: unknown): string | undefined {
+function getRelationModelId(relationModel: unknown): string | undefined {
   if (relationModel && typeof relationModel === 'object') {
     const id = (relationModel as { id?: unknown }).id;
     if (typeof id === 'string' && id.length > 0) {
       return id;
     }
   }
+  return undefined;
+}
+
+function getPayloadRelationId(payloadRelationId: unknown): string | undefined {
   return typeof payloadRelationId === 'string' && payloadRelationId.length > 0 ? payloadRelationId : undefined;
+}
+
+async function resolveCreatedRelationId(
+  client: ReturnType<typeof getLinearClient>,
+  issueId: string,
+  relatedIssueId: string,
+  type: PublicIssueRelationType,
+  responseRelationId?: string,
+): Promise<string | undefined> {
+  if (responseRelationId) {
+    try {
+      const relation = await client.issueRelation(responseRelationId);
+      if (relation?.id) {
+        return relation.id;
+      }
+    } catch {
+      // Fall back to scanning current issue relations for the canonical persisted relation id.
+    }
+  }
+
+  const expected = buildIssueRelationPayload(issueId, relatedIssueId, type);
+  const issue = await client.issue(expected.issueId);
+  if (!issue || typeof issue.relations !== 'function') {
+    return undefined;
+  }
+
+  const relations = await issue.relations();
+  const matches = (relations.nodes ?? []).filter((relation) => (
+    relation.id
+    && relation.type === expected.type
+    && relation.issueId === expected.issueId
+    && relation.relatedIssueId === expected.relatedIssueId
+  ));
+
+  if (matches.length === 1) {
+    return matches[0].id;
+  }
+
+  return undefined;
 }
