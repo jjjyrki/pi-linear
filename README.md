@@ -33,6 +33,8 @@ Issue create and update tools accept relationship IDs (`labelIds`, `projectId`, 
 
 Run `/linear-tools` in Pi for required inputs per tool.
 
+For issue dependencies, use `linear_list_issue_relations` to inspect existing relations and `linear_delete_issue_relation` to remove a specific relation by ID.
+
 ## Troubleshooting
 
 | Symptom | What to check |

@@ -7,9 +7,11 @@ import { linearCreateCommentTool } from './createComment.js';
 import { linearCreateIssueTool } from './createIssue.js';
 import { linearCreateIssuesTool } from './createIssues.js';
 import { linearCreateIssueRelationTool } from './createIssueRelation.js';
+import { linearDeleteIssueRelationTool } from './deleteIssueRelation.js';
 import { linearCreateIssueWithSubissuesTool } from './createIssueWithSubissues.js';
 import { linearCreateTaskSubissuesFromMarkdownTool } from './createTaskSubissuesFromMarkdown.js';
 import { linearListCommentsTool } from './listComments.js';
+import { linearListIssueRelationsTool } from './listIssueRelations.js';
 import { linearListIssuesTool } from './listIssues.js';
 import { linearListCyclesTool } from './listCycles.js';
 import { linearListLabelsTool } from './listLabels.js';
@@ -28,8 +30,10 @@ export const linearToolDefinitions = [
   linearCreateIssuesTool,
   linearCreateIssueWithSubissuesTool,
   linearCreateIssueRelationTool,
+  linearDeleteIssueRelationTool,
   linearCreateTaskSubissuesFromMarkdownTool,
   linearReadIssueTool,
+  linearListIssueRelationsTool,
   linearListIssuesTool,
   linearSearchIssuesTool,
   linearSyncTaskFileTool,

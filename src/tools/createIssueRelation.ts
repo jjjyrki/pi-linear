@@ -5,7 +5,7 @@ import { getLinearClient } from '../client.js';
 import { LinearValidationError } from '../errors.js';
 import { resolveIssue } from '../linear/resolveIssue.js';
 
-const publicRelationTypes = ['blocks', 'blocked_by', 'related'] as const;
+export const publicRelationTypes = ['blocks', 'blocked_by', 'related'] as const;
 export type PublicIssueRelationType = typeof publicRelationTypes[number];
 
 export type NormalizedIssueRelation = {
